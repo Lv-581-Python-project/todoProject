@@ -114,6 +114,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+AUTH_USER_MODEL = 'user.User'
+
 try:
     from project_config.local_settings import *
 except ImportError:
