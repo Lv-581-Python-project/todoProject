@@ -17,6 +17,5 @@ from django.urls import path,include
 
 
 urlpatterns = [
-    path('', include('list_project.urls')),
+    path('list_project/', include('list_project.urls')),
 ]
-
