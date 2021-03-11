@@ -39,9 +39,9 @@ class CustomUser(AbstractBaseUser):
                 'email': self.email}
 
     @classmethod
-    def find_by_id(cls, id):
+    def find_by_id(cls, user_id):
         try:
-            user = cls.objects.get(pk=id)
+            user = cls.objects.get(pk=user_id)
             return user
         except CustomUser.DoesNotExist:
             return None
