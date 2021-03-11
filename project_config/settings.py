@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'list_project.apps.ListProjectConfig',
 ]
 
 MIDDLEWARE = [
@@ -115,6 +116,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 try:
-    from project_config.local_settings import *
+    from local_settings import *
 except ImportError:
     pass
