@@ -34,7 +34,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'task'
+    'todolist',
+    'custom_user',
 ]
 
 MIDDLEWARE = [
@@ -114,6 +115,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+AUTH_USER_MODEL = 'custom_user.CustomUser'
 
 try:
     from project_config.local_settings import *
