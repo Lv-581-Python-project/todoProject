@@ -19,7 +19,7 @@ class TaskAPIView(View):
         }
         return JsonResponse(data)
 
-    def post(self, request, list_id):
+    def post(self, request):
         post_body = json.loads(request.body)
 
         title = post_body.get('title')
