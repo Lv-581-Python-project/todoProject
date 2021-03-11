@@ -15,7 +15,8 @@ class ToDoList(models.Model):
     def to_dict(self):
         return {'name': self.name,
                 'description': self.description,
-                'members': self.members}
+                #'members': self.members
+               }
 
     @classmethod
     def get_by_id(cls, todo_list_pk: int):
