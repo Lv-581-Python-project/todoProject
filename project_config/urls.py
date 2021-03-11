@@ -18,4 +18,5 @@ from django.urls import path, include
 urlpatterns = [
     path('custom_user/', include('custom_user.urls')),
     path('todolist/', include('todolist.urls')),
+    path('tasks/', include('task.urls')),
 ]
