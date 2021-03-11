@@ -1,12 +1,12 @@
 from django.views.generic import DetailView
 from django.http import JsonResponse
 
-from .models import User
+from .models import CustomUser
 from lists.models import List
 
 
 class ProfileView(DetailView):
-    model = User
+    model = CustomUser
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -17,7 +17,6 @@ class ProfileView(DetailView):
         return context
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        data = self.get_context_data(object=self.object)
+        data = self.get_context_data()
         if self.request.GET:
             return JsonResponse(data)
