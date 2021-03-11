@@ -47,10 +47,12 @@ class TaskAPIView(View):
         }
         return JsonResponse(data, status=201)
 
-    def put(self, request, task_id):
-        task = Task.objects.get(id=task_id)
+    def put(self, request):
 
         put_body = json.loads(request.body)
+
+        task_id = put_body.get('task_id')
+        task = Task.objects.get(id=task_id)
 
         task.title = put_body.get('title')
         task.description = put_body.get('description')
@@ -65,7 +67,11 @@ class TaskAPIView(View):
         }
         return JsonResponse(data)
 
-    def delete(self, request, task_id):
+    def delete(self, request):
+
+        delete_body = json.loads(request.body)
+
+        task_id = delete_body.get('task_id')
         Task.objects.get(id=task_id).delete()
 
         data = {
