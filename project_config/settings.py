@@ -34,8 +34,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'list_project',
-    'user',
+    'todolist',
+    'custom_user',
 ]
 
 MIDDLEWARE = [
@@ -116,9 +116,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-AUTH_USER_MODEL = 'user.CustomUser'
+AUTH_USER_MODEL = 'custom_user.CustomUser'
 
 try:
-    from local_settings import *
+    from project_config.local_settings import *
 except ImportError:
     pass
