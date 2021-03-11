@@ -31,7 +31,7 @@ class CustomUser(AbstractBaseUser):
     EMAIL_FIELD = 'email'
 
     def __str__(self):
-        return str(self.first_name) + str(self.last_name)
+        return str(self.first_name) + ' ' + str(self.last_name)
 
     def to_dict(self):
         return {'first_name': self.first_name,
@@ -45,3 +45,15 @@ class CustomUser(AbstractBaseUser):
             return user
         except CustomUser.DoesNotExist:
             return None
+
+    @classmethod
+    def update_user(cls, user_id, data):
+        user = CustomUser.find_by_id(user_id)
+        for key, value in data.items():
+            setattr(user, key, value)
+            user.save()
+
+    @classmethod
+    def delete_user(cls, user_id):
+        user = CustomUser.find_by_id(user_id)
+        user.delete()

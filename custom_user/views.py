@@ -11,3 +11,4 @@ class ProfileView(View):
         if user:
             return JsonResponse(user.to_dict())
         return HttpResponse(status=400)
+
