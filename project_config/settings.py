@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'list_project',
     'user',
 ]
 
@@ -118,6 +119,6 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'user.CustomUser'
 
 try:
-    from project_config.local_settings import *
+    from local_settings import *
 except ImportError:
     pass
