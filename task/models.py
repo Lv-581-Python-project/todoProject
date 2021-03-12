@@ -1,7 +1,7 @@
 from django.db import models
-from django.conf import settings
 from todolist.models import ToDoList
 from custom_user.models import CustomUser
+
 
 
 # Create your models here.
