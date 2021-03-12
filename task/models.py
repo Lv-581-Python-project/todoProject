@@ -10,7 +10,7 @@ class Task(models.Model):
     description = models.TextField(max_length=256)
     is_completed = models.BooleanField(default=False)
     deadline = models.DateField()
-    user_id = models.ForeignKey(CustomUser on_delete=models.CASCADE)
+    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     list_id = models.ForeignKey(ToDoList, on_delete=models.CASCADE)
 
     def __str__(self):
