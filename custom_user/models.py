@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.http import HttpResponse
 from django.db import models
 
 
@@ -46,14 +47,15 @@ class CustomUser(AbstractBaseUser):
         except CustomUser.DoesNotExist:
             return None
 
-    @classmethod
-    def update_user(cls, user_id, data):
-        user = CustomUser.find_by_id(user_id)
-        for key, value in data.items():
-            setattr(user, key, value)
-            user.save()
+    def update(self, data):
+        self.first_name = data['first_name']
+        self.last_name = data['last_name']
+        self.email = data['email']
+        self.save()
+        return True
 
     @classmethod
-    def delete_user(cls, user_id):
-        user = CustomUser.find_by_id(user_id)
+    def delete(cls, user_id):
+        user = cls.find_by_id(user_id)
         user.delete()
+        return HttpResponse('User removed.')
