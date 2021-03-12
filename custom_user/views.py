@@ -1,3 +1,4 @@
+from django.shortcuts import redirect
 from django.views import View
 from django.http import JsonResponse, HttpResponse
 
