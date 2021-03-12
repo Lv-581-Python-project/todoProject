@@ -2,6 +2,7 @@ from django.db import models
 from todolist.models import ToDoList
 from custom_user.models import CustomUser
 from datetime import datetime
+from django.http import HttpResponse
 
 
 
@@ -39,7 +40,7 @@ class Task(models.Model):
         return tasks
 
     @classmethod
-    def create(cls, title: str, description: str, deadline, user_id, task_id):
+    def create(cls, title: str, description: str, deadline: datetime, user_id, task_id):
         task = Task(title=title, description=description, deadline=deadline)
         user = CustomUser.find_by_id(user_id)
         task.user_id = user
@@ -49,15 +50,14 @@ class Task(models.Model):
         return task
 
     def update(self, new_title: str, new_description: str, is_completed: bool, new_deadline: datetime, user_id: int, list_id: int):
-        task = Task(new_title, new_description, new_deadline)
-        task.title = new_title
-        task.description = new_description
-        task.deadline = new_deadline
-        task.is_completed = is_completed
-        task.user_id = CustomUser.find_by_id(user_id)
-        task.list_id = ToDoList.get_by_id(list_id)
-        task.save()
-        return task
+        self.title = new_title
+        self.description = new_description
+        self.deadline = new_deadline
+        self.is_completed = is_completed
+        self.user_id = CustomUser.find_by_id(user_id)
+        self.list_id = ToDoList.get_by_id(list_id)
+        self.save()
+        return self
 
     @classmethod
     def remove(cls, user_id):
@@ -66,4 +66,13 @@ class Task(models.Model):
             task.delete()
         except Task.DoesNotExist:
             return False
-        return True
+        return HttpResponse("Task was deleted.")
+
+    @classmethod
+    def remove_all(cls):
+        try:
+            for el in Task.get_all():
+                Task.remove(el.user_id)
+        except Task.DoesNotExist:
+            return False
+        return HttpResponse("All tasks deleted.")
