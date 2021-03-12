@@ -49,15 +49,14 @@ class Task(models.Model):
         return task
 
     def update(self, new_title: str, new_description: str, is_completed: bool, new_deadline: datetime, user_id: int, list_id: int):
-        task = Task(new_title, new_description, new_deadline)
-        task.title = new_title
-        task.description = new_description
-        task.deadline = new_deadline
-        task.is_completed = is_completed
-        task.user_id = CustomUser.find_by_id(user_id)
-        task.list_id = ToDoList.get_by_id(list_id)
-        task.save()
-        return task
+        self.title= new_title
+        self.description = new_description
+        self.deadline = new_deadline
+        self.is_completed = is_completed
+        self.user_id = CustomUser.find_by_id(user_id)
+        self.list_id = ToDoList.get_by_id(list_id)
+        self.save()
+        return self
 
     @classmethod
     def remove(cls, user_id):
