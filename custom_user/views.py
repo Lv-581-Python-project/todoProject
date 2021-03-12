@@ -1,3 +1,4 @@
+from django.shortcuts import redirect
 from django.views import View
 from django.http import JsonResponse, HttpResponse
 
@@ -35,9 +36,9 @@ class ProfileView(View):
 
     def post(self, first_name=None, last_name=None, email=None):
         if first_name == None:
-            return 'Please, add first name'
+            return HttpResponse('Please, add first name')
         if last_name == None:
-            return 'Please add last name'
+            return HttpResponse('Please add last name')
         user = CustomUser.objects.create_user(first_name, last_name, email)
         return redirect('profile', user_id=user.id)
 
