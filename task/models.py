@@ -1,6 +1,7 @@
 from django.db import models
 from todolist.models import ToDoList
 from custom_user.models import CustomUser
+from datetime import datetime
 
 
 
@@ -47,24 +48,22 @@ class Task(models.Model):
         task.save()
         return task
 
-    @classmethod
-    def update(cls, task_id: int, data: dict):
-        task = cls.find_by_id(task_id)
-        if task:
-            for field, value in data.items():
-                if hasattr(task, field):
-                    setattr(task, field, value)
-                else:
-                    raise KeyError("Failed to update non existing attribute {}.{}".format(
-                        task.__class__.__name__, field))
-            task.save()
-            return cls.find_by_id(task_id=task_id)
-        return None
+    def update(self, new_title: str, new_description: str, is_completed: bool, new_deadline: datetime, user_id: int, list_id: int):
+        task = Task(new_title, new_description, new_deadline)
+        task.title = new_title
+        task.description = new_description
+        task.deadline = new_deadline
+        task.is_completed = is_completed
+        task.user_id = CustomUser.find_by_id(user_id)
+        task.list_id = ToDoList.get_by_id(list_id)
+        task.save()
+        return task
 
     @classmethod
-    def remove(cls, task_id: int):
-        task = cls.find_by_id(task_id=task_id)
-        if task:
+    def remove(cls, user_id):
+        try:
+            task = Task.objects.get(user_id=user_id)
             task.delete()
-        return not cls.find_by_id(task_id=task_id)
-
+        except Task.DoesNotExist:
+            return False
+        return True
