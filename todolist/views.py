@@ -24,7 +24,10 @@ class ToDoListView(View):
         if not data:
             return HttpResponse(status=400)
 
-        data = json.loads(request.body)
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse('Provided invalid JSON', status=400)
 
         data = {
             'name': data.get('name'),
@@ -47,7 +50,11 @@ class ToDoListView(View):
         data = request.body
         if not data:
             return HttpResponse(status=400)
-        data = json.loads(request.body)
+
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse('Provided invalid JSON', status=400)
 
         members_to_add = data.get('members_to_add')
         members_to_delete = data.get('members_to_delete')
