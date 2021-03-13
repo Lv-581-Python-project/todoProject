@@ -1,10 +1,9 @@
 from django.http import JsonResponse
 from django.views import View
 from task.models import Task
-from todolist.models import ToDoList
 from django.core.serializers import serialize
 import json
-from custom_user.models import CustomUser
+from django.db.utils import IntegrityError, DataError
 
 
 class TaskAPIView(View):
@@ -22,7 +21,6 @@ class TaskAPIView(View):
     def post(self, request):
         body = json.loads(request.body)
 
-
         task_data = {
             'title': body.get('title'),
             'description': body.get('description'),
@@ -31,19 +29,33 @@ class TaskAPIView(View):
             'list_id': body.get('list_id'),
         }
 
-        task = Task.create(**task_data)
-        task.save()
+        try:
+            task = Task.create(**task_data)
+            task.save()
 
-        data = {
-            'message': f'New task object has been created with id {task.id}'
-        }
-        return JsonResponse(data, status=201)
+            success_message = {
+                'message': f'New task object has been created with id {task.id}'
+            }
+
+            return JsonResponse(success_message, status=201)
+
+        # Missing parameters
+        except IntegrityError:
+            integrity_message = {
+                'message': f'Cannot create task! One or more parameters are missing'
+            }
+            return JsonResponse(integrity_message, status=400)
+
+        # Invalid input
+        except DataError:
+            invalid_data_message = {
+                'message': f'Cannot create task! One or more parameters are invalid'
+            }
+            return JsonResponse(invalid_data_message, status=400)
 
     def put(self, request):
 
         body = json.loads(request.body)
-
-        task = Task.objects.get(id=body.get('task_id'))
 
         task_data = {
             'title': body.get('title'),
@@ -54,26 +66,48 @@ class TaskAPIView(View):
             'is_completed': body.get('list_id'),
         }
 
-        task.update(**task_data)
+        # Missing ID
+        if not body.get("task_id"):
+            missing_id_message = {
+                'message': f'Cannot update task! Task id is missing!'
+            }
+            return JsonResponse(missing_id_message, status=400)
 
-        data = {
-            'message': f'Task {body.get("task_id")} has been updated'
-        }
-        return JsonResponse(data)
+        task = Task.get_by_id(task_id=body.get('task_id'))
+
+        # ID of non-existing task
+        if not task:
+            not_exist_message = {
+                'message': f'Cannot update task! Task with {body.get("task_id")} does not exist'
+            }
+            return JsonResponse(not_exist_message, status=400)
+
+        try:
+            task.update(**task_data)
+
+            success_message = {
+                'message': f'Task {body.get("task_id")} has been updated'
+            }
+            return JsonResponse(success_message, status=200)
+
+        # Invalid input
+        except DataError:
+            invalid_data_message = {
+                'message': f'Cannot update task! One or more parameters are invalid'
+            }
+            return JsonResponse(invalid_data_message, status=400)
 
     def delete(self, request):
 
         body = json.loads(request.body)
 
-        success = {
-            'message': f'Task with id {body.get("task_id")} has been deleted'
-        }
-
-        failure = {
-            'message': f'Task with id {body.get("task_id")} does not exist!'
-        }
-
         if Task.remove(task_id=body.get('task_id')):
-            return JsonResponse(success)
+            success = {
+                'message': f'Task with id {body.get("task_id")} has been deleted'
+            }
+            return JsonResponse(success, status=200)
         else:
-            return JsonResponse(failure)
+            failure = {
+                'message': f'Task with id {body.get("task_id")} does not exist!'
+            }
+            return JsonResponse(failure, status=400)

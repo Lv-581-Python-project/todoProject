@@ -16,9 +16,9 @@ class Task(models.Model):
         return self.title
 
     @classmethod
-    def find_by_id(cls, task_id: int):
+    def get_by_id(cls, task_id: int):
         try:
-            task = Task.ojects.get(pk=task_id)
+            task = Task.objects.get(pk=task_id)
             return task
         except Task.DoesNotExist:
             return None
