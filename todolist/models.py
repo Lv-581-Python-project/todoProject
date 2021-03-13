@@ -17,11 +17,11 @@ class ToDoList(models.Model):
                 'description': self.description,
                 'members': sorted([member.id for member in self.members.all()])}
 
-    def update(self, data):
-        if data.name:
-            self.name = data.name
-        if data.description:
-            self.description = data.description
+    def update(self, name=None, description=None):
+        if name:
+            self.name = name
+        if description:
+            self.description = description
         self.save()
 
     def update_members(self, members_to_add=None, members_to_delete=None):
