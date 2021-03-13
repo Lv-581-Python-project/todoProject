@@ -14,7 +14,7 @@ class ToDoList(models.Model):
     def to_dict(self):
         return {'name': self.name,
                 'description': self.description,
-                'members': self.members.all()}
+                'members': sorted([member.id for member in self.members.all()])}
 
     def update(self, data):
         if data.name:
