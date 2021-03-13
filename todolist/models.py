@@ -12,15 +12,16 @@ class ToDoList(models.Model):
         return self.name
 
     def to_dict(self):
-        return {'name': self.name,
+        return {'id': self.id,
+                'name': self.name,
                 'description': self.description,
-                'members': self.members.all()}
+                'members': sorted([member.id for member in self.members.all()])}
 
-    def update(self, data):
-        if data.name:
-            self.name = data.name
-        if data.description:
-            self.description = data.description
+    def update(self, name=None, description=None):
+        if name:
+            self.name = name
+        if description:
+            self.description = description
         self.save()
 
     def update_members(self, members_to_add=None, members_to_delete=None):

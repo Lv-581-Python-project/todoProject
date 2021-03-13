@@ -9,56 +9,72 @@ from .models import CustomUser, ToDoList
 class ToDoListView(View):
 
     def get(self, request, todo_list_pk=None):
+        if todo_list_pk:
+            todo_list = ToDoList.get_by_id(todo_list_pk)
+            if not todo_list:
+                return HttpResponse(status=404)
+            return JsonResponse(todo_list.to_dict(), status=200)
 
-        if todo_list_pk is None:
-            todo_lists = ToDoList.get_all()
-            todo_lists_dict = {}
-            for i, todo_list in enumerate(todo_lists):
-                todo_lists_dict[i] = todo_list.to_dict()
-            return JsonResponse(todo_lists_dict)
-        todo_list = ToDoList.get_by_id(todo_list_pk=todo_list_pk)
-
-        if todo_list:
-            return JsonResponse(todo_list.to_dict())
-
-        return HttpResponse(status=400)
+        todo_lists = ToDoList.get_all()
+        todo_lists = json.dumps([todo_list.to_dict() for todo_list in todo_lists])
+        return HttpResponse(todo_lists, status=200, content_type="application/json")
 
     def post(self, request):
-        body = json.loads(request.body)
+        data = request.body
+        if not data:
+            return HttpResponse(status=400)
 
-        name = body.get("name")
-        description = body.get("description")
-        member_pk = body.get("member_pk")
-        user = CustomUser.find_by_id(member_pk)
-        print(user)
-        if user:
-            todo_list = ToDoList.create(name=name, description=description, member_pk=member_pk)
-            return JsonResponse(todo_list.to_dict())
-        return HttpResponse(status=400)
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse('Provided invalid JSON', status=400)
 
-    def delete(self, request, todo_list_pk=None):
+        data = {
+            'name': data.get('name'),
+            'description': data.get('description') if data.get('description') else '',
+            'members': [CustomUser.get_by_id(user_id=user_id) for user_id in data.get('members')]
+            if data.get('members') else None
+        }
 
-        todo_list = ToDoList.get_by_id(todo_list_pk=todo_list_pk)
+        todo_list = ToDoList.create(**data)
         if todo_list:
-            todo_list.remove(todo_list_pk=todo_list_pk)
-            return HttpResponse(status=200)
+            return JsonResponse(todo_list.to_dict(), status=201)
+
         return HttpResponse(status=400)
 
     def put(self, request, todo_list_pk=None):
-        body = json.loads(request.body)
+        todo_list = ToDoList.get_by_id(todo_list_pk)
+        if not todo_list:
+            return HttpResponse(status=404)
 
-        name = body.get('name')
-        description = body.get('description')
-        member_pk = body.get('members')
-        members = CustomUser.objects.filter(id__in=member_pk)
-        todo_list = ToDoList.get_by_id(todo_list_pk=todo_list_pk)
-        if todo_list:
-            list_values = {'members': members,
-                           'name': name,
-                           'description': description}
-            for field, value in list_values.items():
-                if value is None:
-                    del list_values[field]
-            todo_list.update(todo_list_pk=todo_list_pk, data=list_values)
-            return JsonResponse(todo_list.to_dict())
+        data = request.body
+        if not data:
+            return HttpResponse(status=400)
+
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse('Provided invalid JSON', status=400)
+
+        members_to_add = data.get('members_to_add')
+        members_to_delete = data.get('members_to_delete')
+        if members_to_add or members_to_delete:
+            todo_list.update_members(members_to_add, members_to_delete)
+
+        data = {'name': data.get('name') if data.get('name') else None,
+                'description': data.get('description') if data.get('description') else None}
+
+        todo_list.update(**data)
+
+        return HttpResponse(status=200)
+
+    def delete(self, request, todo_list_pk=None):
+        todo_list = ToDoList.get_by_id(todo_list_pk)
+        if not todo_list:
+            return HttpResponse(status=400)
+
+        ToDoList.remove(todo_list_pk)
+
+        if not ToDoList.get_by_id(todo_list_pk):
+            return HttpResponse(status=200)
         return HttpResponse(status=400)
