@@ -23,8 +23,6 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(max_length=256)),
                 ('is_completed', models.BooleanField(default=False)),
                 ('deadline', models.DateField()),
-                ('list_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='todolist.todolist')),
-                ('user_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]

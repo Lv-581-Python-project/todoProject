@@ -38,7 +38,7 @@ class ToDoList(models.Model):
     def create(cls, name: str, description: str, member_pk):
         todo_list = ToDoList(name=name, description=description)
         todo_list.save()
-        member_to_add = CustomUser.find_by_id(user_id=member_pk)
+        member_to_add = CustomUser.get_by_id(user_id=member_pk)
         todo_list.members.add(member_to_add)
         todo_list.save()
         return todo_list

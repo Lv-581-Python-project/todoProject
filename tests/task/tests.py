@@ -1,64 +1,87 @@
-from django.test import TestCase
+from django.test import TestCase, tag
 from task.models import Task
+from custom_user.models import CustomUser
+from todolist.models import ToDoList
+
+from datetime import date
+
 
 class TaskModelsTest(TestCase):
     def setUp(self):
-        self.task1 = Task.objects.create(title="Task #1",
-                            description="Task #1 Description",
-                            deadline=2021-1-1,
-                            user_id=1,
-                            list_id=1)
+        self.user = CustomUser.objects.create(id=1,
+                                              first_name='Test',
+                                              last_name='User',
+                                              email='testuser@gmail.com',
+                                              password='test')
+        self.todolist = ToDoList.create(name="list 1", description="list1 descr", member_pk=self.user.pk)
+        self.todolist.id = 1
+        self.todolist.save()
+        self.task1 = Task.create(title="Task #1",
+                                 description="Task #1 Description",
+                                 deadline=date(2021, 1, 1),
+                                 user_id=self.user.pk,
+                                 list_id=self.todolist.pk)
 
     def test_str(self):
         test = self.task1.__str__()
         self.assertEqual(test, "Task #1")
 
     def test_create(self):
-        task = Task.objects.create(title="Task #2",
-                                         description="Task #1 Description",
-                                         deadline=2021-2-2,
-                                         user_id=2,
-                                         list_id=2)
+        task = Task.create(title="Task #2",
+                           description="Task #2 Description",
+                           deadline=date(2021, 2, 2),
+                           user_id=self.user.pk,
+                           list_id=self.todolist.pk)
         self.assertIsInstance(task, Task)
 
     def test_update_task(self):
-        task = self.task1.update("New task", "new task description", False, 2021-3-3, 3, 3)
-        self.assertEqual(task.title, "New task")
-        self.assertEqual(task.description, "new task description")
-        self.assertEqual(task.is_completed, False)
-        self.assertEqual(task.deadline, 2021-2-2)
-        self.assertEqual(task.user_id, 2)
-        self.assertEqual(task.list_id, 2)
-        self.assertTrue(task)
+        self.task = Task.create(title="Task #3",
+                                description="Task #3 Description",
+                                deadline=date(2021, 3, 3),
+                                user_id=self.user.pk,
+                                list_id=self.todolist.pk)
+        result = self.task.update("New task", "new task description", False, date(2021, 3, 3),
+                                  self.user.pk, self.todolist.pk)
+        self.assertEqual(result.title, "New task")
+        self.assertEqual(result.description, "new task description")
+        self.assertEqual(result.is_completed, False)
+        self.assertEqual(result.deadline, date(2021, 3, 3))
+        print(result.list_id.pk)
+        self.assertEqual(result.user_id.pk, 1)
+        self.assertEqual(result.list_id.pk, 1)
+        self.assertTrue(result)
 
     def test_find_by_id(self):
-        task = Task.find_by_id(2)
-        self.assertIsInstance(task, Task)
+        self.task = Task.create(title="Task #4",
+                                 description="Task #4 Description",
+                                 deadline=date(2021, 5, 3),
+                                 user_id=self.user.pk,
+                                 list_id=self.todolist.pk)
+        result = Task.find_by_id(self.task.pk)
+        self.assertIsInstance(result, Task)
 
     def test_find_by_non_existent_id(self):
-        task = Task.find_by_id(4)
+        task = Task.find_by_id(100)
         self.assertTrue(task is None)
 
     def test_remove_task(self):
-        Task.objects.create(title="Task #3",
-                            description="Task #3 Description",
-                            deadline=2021 - 4 - 4,
-                            user_id=3,
-                            list_id=2)
-        task = Task.remove(3)
-        self.assertIn(b"Task was deleted.", task.content)
+        self.task = Task.create(title="Task #5",
+                                description="Task #5 Description",
+                                deadline=date(2021, 4, 4),
+                                user_id=self.user.pk,
+                                list_id=self.todolist.pk)
+        result = Task.remove(self.task.pk)
+        self.assertNotIn(result, Task.find_all_for_list(self.todolist.pk))
 
     def test_remove_non_existed_task(self):
-        task = Task.remove(4)
-        self.assertEqual(task, False)
+        result = Task.remove(100)
+        self.assertEqual(result, False)
 
-    def test_remove_all_tasks(self):
-        task = Task.remove_all()
-        self.assertIn(b"All tasks deleted.", task.content)
-
-    def test_get_all_does_not_exist(self):
-        task = Task.get_all()
-        self.assertTrue(task is None)
-
-    def test_get_all(self):
-        task = Task.get_all()
+    def test_find_all_for_list(self):
+        self.task = Task.create(title="Task #6",
+                                description="Task #6 Description",
+                                deadline=date(2021, 6, 7),
+                                user_id=self.user.pk,
+                                list_id=self.todolist.pk)
+        result = Task.find_all_for_list(self.todolist.pk)
+        self.assertEqual(len(result), 2)
