@@ -47,12 +47,18 @@ class Task(models.Model):
         return task
 
     def update(self, title: str, description: str, is_completed: bool, deadline: datetime, user_id: int, list_id: int):
-        self.title = title
-        self.description = description
-        self.deadline = deadline
-        self.is_completed = is_completed
-        self.user_id = CustomUser.find_by_id(user_id)
-        self.list_id = ToDoList.get_by_id(list_id)
+        if title:
+            self.title = title
+        if description:
+            self.description = description
+        if deadline:
+            self.deadline = deadline
+        if is_completed:
+            self.is_completed = is_completed
+        if user_id:
+            self.user_id = CustomUser.find_by_id(user_id)
+        if list_id:
+            self.list_id = ToDoList.get_by_id(list_id)
         self.save()
 
     @classmethod

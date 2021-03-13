@@ -4,6 +4,7 @@ from task.models import Task
 from django.core.serializers import serialize
 import json
 from django.db.utils import IntegrityError, DataError
+from django.core.exceptions import ValidationError
 
 
 class TaskAPIView(View):
@@ -19,7 +20,14 @@ class TaskAPIView(View):
         return JsonResponse(data)
 
     def post(self, request):
-        body = json.loads(request.body)
+        # JSON validation
+        try:
+            body = json.loads(request.body)
+        except json.JSONDecodeError:
+            failure = {
+                'message': f'Please provide valid json request!'
+            }
+            return JsonResponse(failure, status=400)
 
         task_data = {
             'title': body.get('title'),
@@ -47,7 +55,7 @@ class TaskAPIView(View):
             return JsonResponse(integrity_message, status=400)
 
         # Invalid input
-        except DataError:
+        except (DataError, ValidationError, ValueError):
             invalid_data_message = {
                 'message': f'Cannot create task! One or more parameters are invalid'
             }
@@ -55,7 +63,14 @@ class TaskAPIView(View):
 
     def put(self, request):
 
-        body = json.loads(request.body)
+        # JSON validation
+        try:
+            body = json.loads(request.body)
+        except json.JSONDecodeError:
+            failure = {
+                'message': f'Please provide valid json request!'
+            }
+            return JsonResponse(failure, status=400)
 
         task_data = {
             'title': body.get('title'),
@@ -73,7 +88,14 @@ class TaskAPIView(View):
             }
             return JsonResponse(missing_id_message, status=400)
 
-        task = Task.get_by_id(task_id=body.get('task_id'))
+        # Invalid ID
+        try:
+            task = Task.get_by_id(task_id=body.get('task_id'))
+        except ValueError:
+            invalid_data_message = {
+                'message': f'Please provide valid ID'
+            }
+            return JsonResponse(invalid_data_message, status=400)
 
         # ID of non-existing task
         if not task:
@@ -91,15 +113,21 @@ class TaskAPIView(View):
             return JsonResponse(success_message, status=200)
 
         # Invalid input
-        except DataError:
+        except (DataError, ValidationError, ValueError):
             invalid_data_message = {
                 'message': f'Cannot update task! One or more parameters are invalid'
             }
             return JsonResponse(invalid_data_message, status=400)
 
     def delete(self, request):
-
-        body = json.loads(request.body)
+        # JSON validation
+        try:
+            body = json.loads(request.body)
+        except json.JSONDecodeError:
+            failure = {
+                'message': f'Please provide valid json request!'
+            }
+            return JsonResponse(failure, status=400)
 
         if Task.remove(task_id=body.get('task_id')):
             success = {
