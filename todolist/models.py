@@ -12,7 +12,8 @@ class ToDoList(models.Model):
         return self.name
 
     def to_dict(self):
-        return {'name': self.name,
+        return {'id': self.id,
+                'name': self.name,
                 'description': self.description,
                 'members': sorted([member.id for member in self.members.all()])}
 
