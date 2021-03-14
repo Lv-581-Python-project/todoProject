@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.views import View
+from rest_framework.views import APIView
 from task.models import Task
 from django.core.serializers import serialize
 import json
@@ -7,7 +8,7 @@ from django.db.utils import IntegrityError, DataError
 from django.core.exceptions import ValidationError
 
 
-class TaskAPIView(View):
+class TaskAPIView(APIView):
 
     def get(self, request, list_id):
         task = Task.objects.filter(list_id=list_id)

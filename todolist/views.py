@@ -1,12 +1,12 @@
 import json
 
 from django.http import JsonResponse, HttpResponse
-from django.views import View
+from rest_framework.views import APIView
 
 from .models import CustomUser, ToDoList
 
 
-class ToDoListView(View):
+class ToDoListView(APIView):
 
     def get(self, request, todo_list_pk=None):
         if todo_list_pk:
