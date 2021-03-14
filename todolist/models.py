@@ -1,4 +1,4 @@
-from django.db import models, IntegrityError
+from django.db import models, IntegrityError, DatabaseError
 
 from custom_user.models import CustomUser
 
@@ -18,17 +18,25 @@ class ToDoList(models.Model):
                 'members': sorted([member.id for member in self.members.all()])}
 
     def update(self, name=None, description=None):
-        if name:
-            self.name = name
-        if description:
-            self.description = description
-        self.save()
+        try:
+            if name:
+                self.name = name
+            if description:
+                self.description = description
+            self.save()
+            return self
+        except (ValueError, IntegrityError, DatabaseError):
+            return None
 
     def update_members(self, members_to_add=None, members_to_delete=None):
-        if members_to_add:
-            self.members.add(*members_to_add)
-        if members_to_delete:
-            self.members.remove(*members_to_delete)
+        try:
+            if members_to_add:
+                self.members.add(*members_to_add)
+            if members_to_delete:
+                self.members.remove(*members_to_delete)
+            return self
+        except (TypeError, ValueError):
+            return None
 
     def get_list_members(self):
         members = self.members.all()
@@ -50,17 +58,15 @@ class ToDoList(models.Model):
 
     @classmethod
     def create(cls, name, description='', members=None):
-        todo_list = ToDoList(name=name, description=description)
         try:
+            todo_list = ToDoList(name=name, description=description)
             todo_list.save()
             if members:
                 todo_list.members.add(*members)
             return todo_list
-        except (ValueError, IntegrityError):
+        except (ValueError, IntegrityError, DatabaseError):
             # log error
             return None
 
-    @classmethod
-    def remove(cls, todo_list_pk):
-        todo_list = ToDoList.objects.get(pk=todo_list_pk)
-        todo_list.delete()
+    def remove(self):
+        self.delete()
