@@ -156,3 +156,53 @@ class ToDoListViewTest(TestCase):
     def test_delete_pass(self):
         response = self.client.generic('DELETE', '/todolist/10/')
         self.assertEqual(response.status_code, 200)
+
+
+class ToDoListCRUDTest(TestCase):
+    def setUp(self) -> None:
+        self.user = CustomUser.objects.create(id=1, first_name="TestUser1", last_name="UserLastName1", email="test1@gmail.com", password="adminpassword1")
+        self.user2 = CustomUser.objects.create(id=2, first_name="TestUser2", last_name="UserLastName2", email="test2@gmail.com", password="adminpassword2")
+
+        self.todo_list = ToDoList.objects.create(name="TestList", description="Test description")
+        self.todo_list.members.add(self.user.id)
+
+    def test_create(self):
+        todo_list1 = ToDoList.create('test list name 1')
+        todo_list2 = ToDoList.create(name='test list name 2', description='test list description 2')
+        todo_list3 = ToDoList.create(name='test list name 3', description='test list description 3',
+                                     members=[self.user, self.user2])
+
+        first_to_dict_expected = {'id': 2, 'name': 'test list name 1', 'description': '', 'members': []}
+        second_to_dict_expected = {'id': 3, 'name': 'test list name 2',
+                                   'description': 'test list description 2', 'members': []}
+        third_to_dict_expected = {'id': 4, 'name': 'test list name 3',
+                                  'description': 'test list description 3', 'members': [1, 2]}
+
+        self.assertEqual(first_to_dict_expected, todo_list1.to_dict())
+        self.assertEqual(second_to_dict_expected, todo_list2.to_dict())
+        self.assertEqual(third_to_dict_expected, todo_list3.to_dict())
+
+    def test_update(self):
+        new_name = 'new list name'
+        self.todo_list.update(name=new_name)
+        self.assertEqual(new_name, self.todo_list.name)
+
+        new_description = 'new list description'
+        self.todo_list.update(description=new_description)
+        self.assertEqual(new_description, self.todo_list.description)
+
+        new_name, new_description = 'absolutely new list name', 'absolutely new list description'
+        self.todo_list.update(name=new_name, description=new_description)
+        self.assertEqual(new_name, self.todo_list.name)
+        self.assertEqual(new_description, self.todo_list.description)
+
+    def test_get_by_id(self):
+        todo_list = ToDoList.get_by_id(1)
+        expected_to_dict = {'id': 1, 'name': 'TestList', 'description': 'Test description', 'members': [1]}
+        self.assertEqual(expected_to_dict, todo_list.to_dict())
+
+    def test_delete_by_id(self):
+        todo_list = ToDoList.get_by_id(1)
+        todo_list.remove()
+        todo_list = ToDoList.get_by_id(1)
+        self.assertEqual(None, todo_list)
