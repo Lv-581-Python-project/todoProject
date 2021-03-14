@@ -10,6 +10,8 @@ class ToDoListView(View):
 
     def get(self, request, todo_list_pk=None):
         if todo_list_pk:
+            if not todo_list_pk.isnumeric():
+                return HttpResponse(status=404)
             todo_list = ToDoList.get_by_id(todo_list_pk)
             if not todo_list:
                 return HttpResponse(status=404)
@@ -27,7 +29,7 @@ class ToDoListView(View):
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
-            return JsonResponse('Provided invalid JSON', status=400)
+            return JsonResponse({"JsonError": "Provided invalid json"}, status=400)
 
         data = {
             'name': data.get('name'),
@@ -39,14 +41,15 @@ class ToDoListView(View):
         todo_list = ToDoList.create(**data)
         if todo_list:
             return JsonResponse(todo_list.to_dict(), status=201)
-
         return HttpResponse(status=400)
 
     def put(self, request, todo_list_pk=None):
-        todo_list = ToDoList.get_by_id(todo_list_pk)
+        if todo_list_pk and not todo_list_pk.isnumeric():
+            return HttpResponse(status=404)
+        if todo_list_pk:
+            todo_list = ToDoList.get_by_id(todo_list_pk)
         if not todo_list:
             return HttpResponse(status=404)
-
         data = request.body
         if not data:
             return HttpResponse(status=400)
@@ -54,27 +57,28 @@ class ToDoListView(View):
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
-            return JsonResponse('Provided invalid JSON', status=400)
+            return JsonResponse({"JSON Error": 'Provided invalid JSON'}, status=400)
 
         members_to_add = data.get('members_to_add')
         members_to_delete = data.get('members_to_delete')
         if members_to_add or members_to_delete:
-            todo_list.update_members(members_to_add, members_to_delete)
-
+            todo_list = todo_list.update_members(members_to_add, members_to_delete)
+            if not todo_list:
+                return HttpResponse(status=400)
         data = {'name': data.get('name') if data.get('name') else None,
                 'description': data.get('description') if data.get('description') else None}
 
-        todo_list.update(**data)
-
+        todo_list = todo_list.update(**data)
+        if not todo_list:
+            return HttpResponse(status=400)
         return HttpResponse(status=200)
 
     def delete(self, request, todo_list_pk=None):
+        if todo_list_pk and not todo_list_pk.isnumeric():
+            return HttpResponse(status=404)
         todo_list = ToDoList.get_by_id(todo_list_pk)
         if not todo_list:
-            return HttpResponse(status=400)
+            return HttpResponse(status=404)
 
-        ToDoList.remove(todo_list_pk)
-
-        if not ToDoList.get_by_id(todo_list_pk):
-            return HttpResponse(status=200)
-        return HttpResponse(status=400)
+        todo_list.remove()
+        return HttpResponse(status=200)
