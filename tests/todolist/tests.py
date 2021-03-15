@@ -179,8 +179,12 @@ class ToDoListViewTest(TestCase):
 
 class ToDoListCRUDTest(TestCase):
     def setUp(self) -> None:
-        self.user = CustomUser.objects.create(id=1, first_name="TestUser1", last_name="UserLastName1", email="test1@gmail.com", password="adminpassword1")
-        self.user2 = CustomUser.objects.create(id=2, first_name="TestUser2", last_name="UserLastName2", email="test2@gmail.com", password="adminpassword2")
+        self.user = CustomUser.objects.create(id=1, first_name="TestUser1",
+                                              last_name="UserLastName1", email="test1@gmail.com",
+                                              password="adminpassword1")
+        self.user2 = CustomUser.objects.create(id=2, first_name="TestUser2",
+                                               last_name="UserLastName2", email="test2@gmail.com",
+                                               password="adminpassword2")
 
         self.todo_list = ToDoList.objects.create(name="TestList", description="Test description")
         self.todo_list.members.add(self.user.id)
@@ -216,12 +220,13 @@ class ToDoListCRUDTest(TestCase):
         self.assertEqual(new_description, self.todo_list.description)
 
     def test_get_by_id(self):
-        todo_list = ToDoList.get_by_id(1)
-        expected_to_dict = {'id': 1, 'name': 'TestList', 'description': 'Test description', 'members': [1]}
+        todo_list = ToDoList.get_by_id(self.todo_list.id)
+        expected_to_dict = {'id': self.todo_list.id, 'name': 'TestList',
+                            'description': 'Test description', 'members': [1]}
         self.assertEqual(expected_to_dict, todo_list.to_dict())
 
     def test_delete_by_id(self):
-        todo_list = ToDoList.get_by_id(1)
+        todo_list = ToDoList.get_by_id(self.todo_list.id)
         todo_list.remove()
-        todo_list = ToDoList.get_by_id(1)
+        todo_list = ToDoList.get_by_id(self.todo_list.id)
         self.assertEqual(None, todo_list)
