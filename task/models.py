@@ -1,11 +1,11 @@
-from django.db import models
-from django.conf import settings
-from todolist.models import ToDoList
-from custom_user.models import CustomUser
 from datetime import datetime
 
+from django.db import models
 
-# Create your models here.
+from custom_user.models import CustomUser
+from todolist.models import ToDoList
+
+
 class Task(models.Model):
     title = models.CharField(max_length=30)
     description = models.TextField(max_length=256)
@@ -18,7 +18,7 @@ class Task(models.Model):
         return self.title
 
     @classmethod
-    def find_by_id(cls, task_id: int):
+    def get_by_id(cls, task_id: int):
         try:
             task = Task.objects.get(pk=task_id)
             return task
@@ -39,29 +39,39 @@ class Task(models.Model):
         return tasks
 
     @classmethod
-    def create(cls, title: str, description: str, deadline, user_id, task_id):
+    def create(cls, title: str, description: str, deadline, user_id, list_id):
         task = Task(title=title, description=description, deadline=deadline)
-        user = CustomUser.find_by_id(user_id)
+        user = CustomUser.get_by_id(user_id)
         task.user_id = user
-        list = ToDoList.get_by_id(task_id)
-        task.list_id = list
+        todolist = ToDoList.get_by_id(list_id)
+        task.list_id = todolist
         task.save()
         return task
 
-    def update(self, new_title: str, new_description: str, is_completed: bool, new_deadline: datetime, user_id: int, list_id: int):
-        self.title= new_title
-        self.description = new_description
-        self.deadline = new_deadline
-        self.is_completed = is_completed
-        self.user_id = CustomUser.find_by_id(user_id)
-        self.list_id = ToDoList.get_by_id(list_id)
+    def update(self, title: str,
+               description: str,
+               is_completed: bool,
+               deadline: datetime,
+               user_id: int,
+               list_id: int):
+        if title:
+            self.title = title
+        if description:
+            self.description = description
+        if deadline:
+            self.deadline = deadline
+        if is_completed:
+            self.is_completed = is_completed
+        if user_id:
+            self.user_id = CustomUser.get_by_id(user_id)
+        if list_id:
+            self.list_id = ToDoList.get_by_id(list_id)
         self.save()
-        return self
 
     @classmethod
-    def remove(cls, user_id):
+    def remove(cls, task_id):
         try:
-            task = Task.objects.get(user_id=user_id)
+            task = Task.objects.get(id=task_id)
             task.delete()
         except Task.DoesNotExist:
             return False

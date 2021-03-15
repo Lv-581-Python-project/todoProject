@@ -36,7 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'todolist',
     'custom_user',
-    'task'
+    'task',
+    'rest_framework',
+    'drf_yasg',
+
 ]
 
 MIDDLEWARE = [
