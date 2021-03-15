@@ -46,8 +46,7 @@ class ToDoListView(View):
     def put(self, request, todo_list_pk=None):
         if todo_list_pk and not todo_list_pk.isnumeric():
             return HttpResponse(status=404)
-        if todo_list_pk:
-            todo_list = ToDoList.get_by_id(todo_list_pk)
+        todo_list = ToDoList.get_by_id(todo_list_pk)
         if not todo_list:
             return HttpResponse(status=404)
         data = request.body

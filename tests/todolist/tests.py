@@ -7,12 +7,19 @@ from custom_user.models import CustomUser
 class ToDoListViewTest(TestCase):
 
     def setUp(self):
-        self.user = CustomUser.objects.create(
-            id=1, first_name="TestUser", last_name="UserLastName", email="test@gmail.com", password="adminpassword")
-        self.user2 = CustomUser.objects.create(
-            id=2, first_name="TestUser2", last_name="UserLastName2", email="test2@gmail.com", password="adminpassword2")
-        self.todo_list = ToDoList.objects.create(
-            id=10, name="TestList", description="Test description")
+        self.user = CustomUser.objects.create(id=1,
+                                              first_name="TestUser",
+                                              last_name="UserLastName",
+                                              email="test@gmail.com",
+                                              password="adminpassword")
+        self.user2 = CustomUser.objects.create(id=2,
+                                               first_name="TestUser2",
+                                               last_name="UserLastName2",
+                                               email="test2@gmail.com",
+                                               password="adminpassword2")
+        self.todo_list = ToDoList.objects.create(id=10,
+                                                 name="TestList",
+                                                 description="Test description")
         self.todo_list.members.add(self.user.id)
 
     # Testing GET method
@@ -37,7 +44,8 @@ class ToDoListViewTest(TestCase):
 
     def test_post_data_valid_data(self):
         response = self.client.generic('POST', '/todolist/', json.dumps({
-            "name": "name1", "description": "LIST1", "members": [self.user.id]
+            "name": "name1",
+            "description": "LIST1", "members": [self.user.id]
         }))
         self.assertEqual(response.status_code, 201)
 
@@ -47,19 +55,22 @@ class ToDoListViewTest(TestCase):
 
     def test_post_data_name_missing_fail(self):
         response = self.client.generic('POST', '/todolist/', json.dumps({
-            "description": "LIST1", "members": [self.user.id]
+            "description": "LIST1",
+            "members": [self.user.id]
         }))
         self.assertEqual(response.status_code, 400)
 
     def test_post_data_description_missing_pass(self):
         response = self.client.generic('POST', '/todolist/', json.dumps({
-             "name": "name1", "members": [self.user.id]
+            "name": "name1",
+            "members": [self.user.id]
         }))
         self.assertEqual(response.status_code, 201)
 
     def test_post_data_members_missing_pass(self):
         response = self.client.generic('POST', '/todolist/', json.dumps({
-             "name": "name1", "description": "LIST1"
+            "name": "name1",
+            "description": "LIST1"
         }))
         self.assertEqual(response.status_code, 201)
 
@@ -78,19 +89,25 @@ class ToDoListViewTest(TestCase):
 
     def test_put_missing_todo_list_pk(self):
         response = self.client.generic('PUT', '/todolist/', json.dumps({
-            "name": "namePUT", "description": "LIST1PUT", "members": [self.user.id]
+            "name": "namePUT",
+            "description": "LIST1PUT",
+            "members": [self.user.id]
         }))
         self.assertEqual(response.status_code, 404)
 
     def test_put_not_existing_todo_list_pk(self):
         response = self.client.generic('PUT', '/todolist/42/', json.dumps({
-            "name": "namePUT", "description": "LIST1PUT", "members": [self.user.id]
+            "name": "namePUT",
+            "description": "LIST1PUT",
+            "members": [self.user.id]
         }))
         self.assertEqual(response.status_code, 404)
 
     def test_put_wrong_todo_list_pk(self):
         response = self.client.generic('PUT', '/todolist/w/', json.dumps({
-            "name": "namePUT", "description": "LIST1PUT", "members": [self.user.id]
+            "name": "namePUT",
+            "description": "LIST1PUT",
+            "members": [self.user.id]
         }))
         self.assertEqual(response.status_code, 404)
 
@@ -100,7 +117,9 @@ class ToDoListViewTest(TestCase):
 
     def test_put_valid_data(self):
         response = self.client.generic('PUT', '/todolist/10/', json.dumps({
-            "name": "namePUT", "description": "LIST1PUT", "members_to_add": [self.user2.id]
+            "name": "namePUT",
+            "description": "LIST1PUT",
+            "members_to_add": [self.user2.id]
         }))
         self.assertEqual(response.status_code, 200)
 
