@@ -11,11 +11,19 @@ class DeleteTaskView(TestCase):
     """ Test view for deleting an existing task """
 
     def setUp(self):
-        self.user = CustomUser.objects.create_user(
-            first_name="Test", last_name="User", email="mail@mail.com", password="secret")
-        self.list = ToDoList.create(name='List', description='About list', member_pk=self.user.id)
-        self.task = Task.create(
-            title='Task', description='Task', deadline='2020-01-01', list_id=self.list.id, user_id=self.user.id)
+        self.user = CustomUser.objects.create_user(first_name="Test",
+                                                   last_name="User",
+                                                   email="mail@mail.com",
+                                                   password="secret"
+                                                   )
+        self.list = ToDoList.create(name='List',
+                                    description='About list',
+                                    member_pk=self.user.id)
+        self.task = Task.create(title='Task',
+                                description='Task',
+                                deadline='2020-01-01',
+                                list_id=self.list.id,
+                                user_id=self.user.id)
 
     def test_delete_task_existing(self):
         response = self.client.generic('DELETE', '/tasks/', json.dumps({'task_id': self.task.id}))
@@ -30,13 +38,20 @@ class CreateTaskView(TestCase):
     """ Test view for creating new task """
 
     def setUp(self):
-        self.user = CustomUser.objects.create_user(
-            first_name="Test", last_name="User", email="mail@mail.com", password="secret")
-        self.list = ToDoList.create(name='List', description='About list', member_pk=self.user.id)
+        self.user = CustomUser.objects.create_user(first_name="Test",
+                                                   last_name="User",
+                                                   email="mail@mail.com",
+                                                   password="secret")
+        self.list = ToDoList.create(name='List',
+                                    description='About list',
+                                    member_pk=self.user.id)
 
     def test_create_task_data_valid(self):
         response = self.client.generic('POST', '/tasks/', json.dumps({
-            "title": "Task", "description": "Task", "deadline": "2020-01-01", "user_id": self.user.id,
+            "title": "Task",
+            "description": "Task",
+            "deadline": "2020-01-01",
+            "user_id": self.user.id,
             "list_id": self.list.id
         }))
         self.assertEqual(response.status_code, 201)
@@ -44,7 +59,10 @@ class CreateTaskView(TestCase):
     def test_create_task_data_invalid(self):
         response = self.client.generic('POST', '/tasks/', json.dumps({
             "title": "Task name that way beyond 30 symbol limit",
-            "description": "Task", "deadline": "2020-01-01", "user_id": self.user.id, "list_id": self.list.id
+            "description": "Task",
+            "deadline": "2020-01-01",
+            "user_id": self.user.id,
+            "list_id": self.list.id
         }))
         self.assertEqual(response.status_code, 400)
 
@@ -57,11 +75,18 @@ class UpdateTaskView(TestCase):
     """ Test view for updating existing task """
 
     def setUp(self):
-        self.user = CustomUser.objects.create_user(
-            first_name="Test", last_name="User", email="mail@mail.com", password="secret")
-        self.list = ToDoList.create(name='List', description='About list', member_pk=self.user.id)
-        self.task = Task.create(
-            title='Task', description='Task', deadline='2020-01-01', list_id=self.list.id, user_id=self.user.id)
+        self.user = CustomUser.objects.create_user(first_name="Test",
+                                                   last_name="User",
+                                                   email="mail@mail.com",
+                                                   password="secret")
+        self.list = ToDoList.create(name='List',
+                                    description='About list',
+                                    member_pk=self.user.id)
+        self.task = Task.create(title='Task',
+                                description='Task',
+                                deadline='2020-01-01',
+                                list_id=self.list.id,
+                                user_id=self.user.id)
 
     def test_update_task_existing(self):
         response = self.client.generic('PUT', '/tasks/', json.dumps({

@@ -1,10 +1,12 @@
+import json
+
+from django.core.serializers import serialize
 from django.http import JsonResponse
 from django.views import View
-from task.models import Task
-from django.core.serializers import serialize
-import json
 from django.db.utils import IntegrityError, DataError
 from django.core.exceptions import ValidationError
+
+from task.models import Task
 
 
 class TaskAPIView(View):
@@ -25,7 +27,7 @@ class TaskAPIView(View):
             body = json.loads(request.body)
         except json.JSONDecodeError:
             failure = {
-                'message': f'Please provide valid json request!'
+                'message': 'Please provide valid json request!'
             }
             return JsonResponse(failure, status=400)
 
@@ -50,14 +52,14 @@ class TaskAPIView(View):
         # Missing parameters
         except IntegrityError:
             integrity_message = {
-                'message': f'Cannot create task! One or more parameters are missing'
+                'message': 'Cannot create task! One or more parameters are missing'
             }
             return JsonResponse(integrity_message, status=400)
 
         # Invalid input
         except (DataError, ValidationError, ValueError):
             invalid_data_message = {
-                'message': f'Cannot create task! One or more parameters are invalid'
+                'message': 'Cannot create task! One or more parameters are invalid'
             }
             return JsonResponse(invalid_data_message, status=400)
 
@@ -68,7 +70,7 @@ class TaskAPIView(View):
             body = json.loads(request.body)
         except json.JSONDecodeError:
             failure = {
-                'message': f'Please provide valid json request!'
+                'message': 'Please provide valid json request!'
             }
             return JsonResponse(failure, status=400)
 
@@ -84,7 +86,7 @@ class TaskAPIView(View):
         # Missing ID
         if not body.get("task_id"):
             missing_id_message = {
-                'message': f'Cannot update task! Task id is missing!'
+                'message': 'Cannot update task! Task id is missing!'
             }
             return JsonResponse(missing_id_message, status=400)
 
@@ -93,14 +95,14 @@ class TaskAPIView(View):
             task = Task.get_by_id(task_id=body.get('task_id'))
         except ValueError:
             invalid_data_message = {
-                'message': f'Please provide valid ID'
+                'message': 'Please provide valid ID'
             }
             return JsonResponse(invalid_data_message, status=400)
 
         # ID of non-existing task
         if not task:
             not_exist_message = {
-                'message': f'Cannot update task! Task with {body.get("task_id")} does not exist'
+                'message': 'Cannot update task! Task with {body.get("task_id")} does not exist'
             }
             return JsonResponse(not_exist_message, status=400)
 
@@ -115,7 +117,7 @@ class TaskAPIView(View):
         # Invalid input
         except (DataError, ValidationError, ValueError):
             invalid_data_message = {
-                'message': f'Cannot update task! One or more parameters are invalid'
+                'message': 'Cannot update task! One or more parameters are invalid'
             }
             return JsonResponse(invalid_data_message, status=400)
 
@@ -125,7 +127,7 @@ class TaskAPIView(View):
             body = json.loads(request.body)
         except json.JSONDecodeError:
             failure = {
-                'message': f'Please provide valid json request!'
+                'message': 'Please provide valid json request!'
             }
             return JsonResponse(failure, status=400)
 

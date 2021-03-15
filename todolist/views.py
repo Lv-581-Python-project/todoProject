@@ -19,7 +19,7 @@ class ToDoListView(View):
 
         todo_lists = ToDoList.get_all()
         todo_lists = json.dumps([todo_list.to_dict() for todo_list in todo_lists])
-        return HttpResponse(todo_lists, status=200, content_type="application/json")
+        return JsonResponse(todo_lists, status=200)
 
     def post(self, request):
         data = request.body
