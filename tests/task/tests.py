@@ -1,4 +1,4 @@
-from django.test import TestCase, tag
+from django.test import TestCase
 from task.models import Task
 from custom_user.models import CustomUser
 from todolist.models import ToDoList
@@ -61,7 +61,7 @@ class TaskModelsTest(TestCase):
         self.assertIsInstance(result, Task)
 
     def test_find_by_non_existent_id(self):
-        task = Task.find_by_id(100)
+        task = Task.get_by_id(100)
         self.assertTrue(task is None)
 
     def test_remove_task(self):

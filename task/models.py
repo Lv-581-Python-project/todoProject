@@ -19,7 +19,7 @@ class Task(models.Model):
         return self.title
 
     @classmethod
-    def find_by_id(cls, task_id: int):
+    def get_by_id(cls, task_id: int):
         try:
             task = Task.objects.get(pk=task_id)
             return task
@@ -36,26 +36,44 @@ class Task(models.Model):
         task = Task(title=title, description=description, deadline=deadline)
         user = CustomUser.get_by_id(user_id)
         task.user_id = user
-        list = ToDoList.get_by_id(list_id)
-        task.list_id = list
+        todolist = ToDoList.get_by_id(list_id)
+        task.list_id = todolist
         task.save()
         return task
 
-    def update(self, title: str, description: str, is_completed: bool, deadline: date, user_id: int, list_id: int):
-        self.title = title
-        self.description = description
-        self.deadline = deadline
-        self.is_completed = is_completed
-        self.user_id = CustomUser.get_by_id(user_id)
-        self.list_id = ToDoList.get_by_id(list_id)
+    def update(self, title: str,
+               description: str,
+               is_completed: bool,
+               deadline: date,
+               user_id: int,
+               list_id: int):
+        if title:
+            self.title = title
+        if description:
+            self.description = description
+        if deadline:
+            self.deadline = deadline
+        if is_completed:
+            self.is_completed = is_completed
+        if user_id:
+            self.user_id = CustomUser.get_by_id(user_id)
+        if list_id:
+            self.list_id = ToDoList.get_by_id(list_id)
         self.save()
-        return self.find_by_id(self.pk)
+
+    @classmethod
+    def get_all(cls):
+        try:
+            task = Task.objects.all()
+            return task
+        except Task.DoesNotExist:
+            return None
 
     @classmethod
     def remove(cls, task_id):
-        task = Task.find_by_id(task_id)
-        if task:
+        try:
+            task = Task.objects.get(id=task_id)
             task.delete()
-            return HttpResponse("Task was deleted.")
-        else:
-                return False
+        except Task.DoesNotExist:
+            return False
+        return True
