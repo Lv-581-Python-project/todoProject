@@ -102,7 +102,7 @@ class TaskAPIView(View):
         # ID of non-existing task
         if not task:
             not_exist_message = {
-                'message': 'Cannot update task! Task with {body.get("task_id")} does not exist'
+                'message': f'Cannot update task! Task with {body.get("task_id")} does not exist'
             }
             return JsonResponse(not_exist_message, status=400)
 
