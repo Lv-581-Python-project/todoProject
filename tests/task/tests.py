@@ -54,10 +54,10 @@ class TaskModelsTest(TestCase):
 
     def test_find_by_id(self):
         self.task = Task.create(title="Task #4",
-                                 description="Task #4 Description",
-                                 deadline=date(2021, 5, 3),
-                                 user_id=self.user.pk,
-                                 list_id=self.todolist.pk)
+                                description="Task #4 Description",
+                                deadline=date(2021, 5, 3),
+                                user_id=self.user.pk,
+                                list_id=self.todolist.pk)
         result = Task.find_by_id(self.task.pk)
         self.assertIsInstance(result, Task)
 
@@ -86,8 +86,8 @@ class TaskModelsTest(TestCase):
                                 list_id=self.todolist.pk)
         result = Task.find_all_for_list(self.todolist.pk)
         self.assertEqual(len(result), 2)
-        
-        
+
+
 class DeleteTaskView(TestCase):
     """ Test view for deleting an existing task """
 
