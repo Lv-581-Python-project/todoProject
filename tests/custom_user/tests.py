@@ -1,5 +1,7 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from custom_user.models import CustomUser
+import json
+
 
 
 class CustomUserModelsTestCase(TestCase):
@@ -64,3 +66,52 @@ class CustomUserModelsTestCase(TestCase):
                                   password='test1')
         res = CustomUser.remove(2)
         self.assertIn(b'User removed', res.content)
+
+class CustomUserViewsTestCase(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create(id=2,
+                                              first_name="Test",
+                                              last_name="User",
+                                              email="testuser@gmail.com",
+                                              password="test")
+
+        self.user = CustomUser.objects.create(id=3,
+                                              first_name="Test2",
+                                              last_name="User2",
+                                              email="testuser2@gmail.com",
+                                              password="test2")
+
+
+
+    def test_get_by_id(self):
+        data = {'first_name': 'Test', 'last_name': 'User', 'email': 'testuser@gmail.com'}
+        responce = self.client.get('/custom_user/profile/2/')
+        self.assertEqual(responce.json() , data)
+
+    def test_create_user(self):
+        data = {'first_name': 'Test3', 'last_name': 'User3', 'email': 'testuser3@gmail.com'}
+        response = self.client.generic('POST', '/custom_user/create/', json.dumps({'first_name': 'Test3',
+                                                                                   'last_name': 'User3',
+                                                                                   'email': 'testuser3@gmail.com'}))
+        self.assertEqual(response.json(),data)
+
+    def test_put_all_input_data(self):
+        data = {'first_name': 'NewName', 'last_name': 'User', 'email': 'testuser@gmail.com'}
+        response = self.client.generic('PUT', '/custom_user/profile/2/', json.dumps({'first_name': 'NewName',
+                                                                                   'last_name': 'User',
+                                                                                   'email': 'testuser@gmail.com'}))
+        self.assertEqual(response.json(), data)
+
+    def test_put_not_all_input_data(self):
+        data = {'first_name': 'Test', 'last_name': 'NewUser', 'email': 'testuser@gmail.com'}
+        response = self.client.generic('PUT', '/custom_user/profile/2/', json.dumps({'last_name': 'NewUser',
+                                                                                   'email': 'testuser@gmail.com'}))
+        self.assertEqual(response.json(), data)
+
+    def test_delete(self):
+        response = self.client.generic('DELETE', '/custom_user/profile/2/')
+        self.assertEqual(response.status_code, 200)
+
+
+
+
