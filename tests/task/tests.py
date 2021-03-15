@@ -198,4 +198,3 @@ class UpdateTaskView(TestCase):
             "deadline": "2020-01-01"
         }))
         self.assertEqual(response.status_code, 400)
-
