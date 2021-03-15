@@ -14,7 +14,8 @@ class TaskModelsTest(TestCase):
                                               last_name='User',
                                               email='testuser@gmail.com',
                                               password='test')
-        self.todolist = ToDoList.create(name="list 1", description="list1 descr", member_pk=self.user.pk)
+        self.todolist = ToDoList.create(name="list 1", description="list1 descr")
+        self.todolist.update_members(members_to_add=[self.user.pk])
         self.todolist.id = 1
         self.todolist.save()
         self.task1 = Task.create(title="Task #1",
@@ -58,7 +59,7 @@ class TaskModelsTest(TestCase):
                                 deadline=date(2021, 5, 3),
                                 user_id=self.user.pk,
                                 list_id=self.todolist.pk)
-        result = Task.find_by_id(self.task.pk)
+        result = Task.get_by_id(self.task.pk)
         self.assertIsInstance(result, Task)
 
     def test_find_by_non_existent_id(self):
@@ -98,8 +99,8 @@ class DeleteTaskView(TestCase):
                                                    password="secret"
                                                    )
         self.list = ToDoList.create(name='List',
-                                    description='About list',
-                                    member_pk=self.user.id)
+                                    description='About list')
+        self.list.update_members(members_to_add=[self.user.id])
         self.task = Task.create(title='Task',
                                 description='Task',
                                 deadline='2020-01-01',
@@ -124,8 +125,8 @@ class CreateTaskView(TestCase):
                                                    email="mail@mail.com",
                                                    password="secret")
         self.list = ToDoList.create(name='List',
-                                    description='About list',
-                                    member_pk=self.user.id)
+                                    description='About list')
+        self.list.update_members(members_to_add=[self.user.id])
 
     def test_create_task_data_valid(self):
         response = self.client.generic('POST', '/tasks/', json.dumps({
@@ -161,8 +162,8 @@ class UpdateTaskView(TestCase):
                                                    email="mail@mail.com",
                                                    password="secret")
         self.list = ToDoList.create(name='List',
-                                    description='About list',
-                                    member_pk=self.user.id)
+                                    description='About list')
+        self.list.update_members(members_to_add=[self.user.id])
         self.task = Task.create(title='Task',
                                 description='Task',
                                 deadline='2020-01-01',
