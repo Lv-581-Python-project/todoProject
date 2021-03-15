@@ -1,7 +1,9 @@
-from django.db import models
-from todolist.models import ToDoList
-from custom_user.models import CustomUser
 from datetime import datetime
+
+from django.db import models
+
+from custom_user.models import CustomUser
+from todolist.models import ToDoList
 
 
 class Task(models.Model):
@@ -39,14 +41,19 @@ class Task(models.Model):
     @classmethod
     def create(cls, title: str, description: str, deadline, user_id, list_id):
         task = Task(title=title, description=description, deadline=deadline)
-        user = CustomUser.find_by_id(user_id)
+        user = CustomUser.get_by_id(user_id)
         task.user_id = user
-        list = ToDoList.get_by_id(list_id)
-        task.list_id = list
+        todolist = ToDoList.get_by_id(list_id)
+        task.list_id = todolist
         task.save()
         return task
 
-    def update(self, title: str, description: str, is_completed: bool, deadline: datetime, user_id: int, list_id: int):
+    def update(self, title: str,
+               description: str,
+               is_completed: bool,
+               deadline: datetime,
+               user_id: int,
+               list_id: int):
         if title:
             self.title = title
         if description:
@@ -56,7 +63,7 @@ class Task(models.Model):
         if is_completed:
             self.is_completed = is_completed
         if user_id:
-            self.user_id = CustomUser.find_by_id(user_id)
+            self.user_id = CustomUser.get_by_id(user_id)
         if list_id:
             self.list_id = ToDoList.get_by_id(list_id)
         self.save()
