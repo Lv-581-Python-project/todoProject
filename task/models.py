@@ -1,12 +1,9 @@
-from django.db import models
-from todolist.models import ToDoList
-from custom_user.models import CustomUser
 from datetime import date
-from django.http import HttpResponse
+from django.db import models
+from custom_user.models import CustomUser
+from todolist.models import ToDoList
 
 
-
-# Create your models here.
 class Task(models.Model):
     title = models.CharField(max_length=30)
     description = models.TextField(max_length=256)
