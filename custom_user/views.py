@@ -1,11 +1,12 @@
 import json
 from django.http import JsonResponse, HttpResponse
 from django.views import View
+from rest_framework.views import APIView
 
 from .models import CustomUser
 
 
-class ProfileView(View):
+class ProfileView(APIView):
 
     def get(self, request, user_id=None):
         user = CustomUser.get_by_id(user_id)
