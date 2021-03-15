@@ -1,7 +1,5 @@
-from datetime import datetime
-
+from datetime import date
 from django.db import models
-
 from custom_user.models import CustomUser
 from todolist.models import ToDoList
 
@@ -26,20 +24,12 @@ class Task(models.Model):
             return None
 
     @classmethod
-    def get_all(cls):
-        try:
-            task = Task.objects.all()
-            return task
-        except Task.DoesNotExist:
-            return None
-
-    @classmethod
     def find_all_for_list(cls, list_id):
         tasks = Task.objects.filter(list_id=list_id)
         return tasks
 
     @classmethod
-    def create(cls, title: str, description: str, deadline, user_id, list_id):
+    def create(cls, title: str, description: str, deadline: date, user_id, list_id):
         task = Task(title=title, description=description, deadline=deadline)
         user = CustomUser.get_by_id(user_id)
         task.user_id = user
@@ -51,7 +41,7 @@ class Task(models.Model):
     def update(self, title: str,
                description: str,
                is_completed: bool,
-               deadline: datetime,
+               deadline: date,
                user_id: int,
                list_id: int):
         if title:
@@ -67,6 +57,14 @@ class Task(models.Model):
         if list_id:
             self.list_id = ToDoList.get_by_id(list_id)
         self.save()
+
+    @classmethod
+    def get_all(cls):
+        try:
+            task = Task.objects.all()
+            return task
+        except Task.DoesNotExist:
+            return None
 
     @classmethod
     def remove(cls, task_id):
