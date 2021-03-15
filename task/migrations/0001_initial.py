@@ -10,8 +10,6 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('todolist', '0002_todolist_members'),
     ]
 
     operations = [
