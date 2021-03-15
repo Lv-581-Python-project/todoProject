@@ -1,8 +1,9 @@
 from datetime import datetime
 
 from django.db import models
-from todolist.models import ToDoList
+
 from custom_user.models import CustomUser
+from todolist.models import ToDoList
 
 
 class Task(models.Model):
