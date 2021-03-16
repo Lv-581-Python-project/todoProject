@@ -226,7 +226,5 @@ class ToDoListCRUDTest(TestCase):
         self.assertEqual(expected_to_dict, todo_list.to_dict())
 
     def test_delete_by_id(self):
-        todo_list = ToDoList.get_by_id(self.todo_list.id)
-        todo_list.remove()
-        todo_list = ToDoList.get_by_id(self.todo_list.id)
-        self.assertEqual(None, todo_list)
+        list_del = ToDoList.remove(self.todo_list.id)
+        self.assertEqual(True, list_del)
