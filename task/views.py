@@ -21,14 +21,7 @@ class TaskAPIView(APIView):
         return JsonResponse(data)
 
     def post(self, request):
-        # JSON validation
-        try:
-            body = json.loads(request.body)
-        except json.JSONDecodeError:
-            failure = {
-                'message': 'Please provide valid json request!'
-            }
-            return JsonResponse(failure, status=400)
+        body = request.body
 
         task_data = {
             'title': body.get('title'),
@@ -63,15 +56,7 @@ class TaskAPIView(APIView):
             return JsonResponse(invalid_data_message, status=400)
 
     def put(self, request):
-
-        # JSON validation
-        try:
-            body = json.loads(request.body)
-        except json.JSONDecodeError:
-            failure = {
-                'message': 'Please provide valid json request!'
-            }
-            return JsonResponse(failure, status=400)
+        body = request.body
 
         task_data = {
             'title': body.get('title'),
@@ -91,7 +76,7 @@ class TaskAPIView(APIView):
 
         # Invalid ID
         try:
-            task = Task.get_by_id(task_id=body.get('task_id'))
+            task = Task.get_by_id(pk=body.get('task_id'))
         except ValueError:
             invalid_data_message = {
                 'message': 'Please provide valid ID'
@@ -121,14 +106,7 @@ class TaskAPIView(APIView):
             return JsonResponse(invalid_data_message, status=400)
 
     def delete(self, request):
-        # JSON validation
-        try:
-            body = json.loads(request.body)
-        except json.JSONDecodeError:
-            failure = {
-                'message': 'Please provide valid json request!'
-            }
-            return JsonResponse(failure, status=400)
+        body = request.body
 
         if Task.remove(task_id=body.get('task_id')):
             success = {

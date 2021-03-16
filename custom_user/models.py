@@ -48,7 +48,6 @@ class CustomUser(AbstractBaseUser):
             return None
 
     def update(self, first_name=None, last_name=None, email=None):
-
         if first_name:
             self.first_name = first_name
         if last_name:
@@ -58,7 +57,7 @@ class CustomUser(AbstractBaseUser):
         try:
             self.save()
             return self
-        except:
+        except (TypeError, ValueError):
             return None
 
     @classmethod
