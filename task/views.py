@@ -11,7 +11,7 @@ from task.models import Task
 class TaskAPIView(APIView):
 
     def get(self, request, list_id):
-        task = Task.objects.filter(list_id=list_id)
+        task = Task.find_all_for_list(list_id=list_id)
 
         task_serialized_data = serialize('python', task)
 
@@ -36,7 +36,7 @@ class TaskAPIView(APIView):
             task.save()
 
             success_message = {
-                'message': f'New task object has been created with id {task.id}'
+                'message': f'New task object has been created with ID {task.id}'
             }
 
             return JsonResponse(success_message, status=201)
@@ -55,7 +55,7 @@ class TaskAPIView(APIView):
             }
             return JsonResponse(invalid_data_message, status=400)
 
-    def put(self, request):
+    def put(self, request, task_id=None):
         body = request.body
 
         task_data = {
@@ -68,33 +68,27 @@ class TaskAPIView(APIView):
         }
 
         # Missing ID
-        if not body.get("task_id"):
+        if not task_id:
             missing_id_message = {
-                'message': 'Cannot update task! Task id is missing!'
+                'message': 'Cannot update task! Task ID is missing!'
             }
             return JsonResponse(missing_id_message, status=400)
 
-        # Invalid ID
-        try:
-            task = Task.get_by_id(pk=body.get('task_id'))
-        except ValueError:
-            invalid_data_message = {
-                'message': 'Please provide valid ID'
-            }
-            return JsonResponse(invalid_data_message, status=400)
+        task = Task.get_by_id(pk=task_id)
 
         # ID of non-existing task
         if not task:
             not_exist_message = {
-                'message': f'Cannot update task! Task with {body.get("task_id")} does not exist'
+                'message': f'Cannot update task! Task with ID {task_id} does not exist'
             }
             return JsonResponse(not_exist_message, status=400)
 
+        # Update
         try:
             task.update(**task_data)
 
             success_message = {
-                'message': f'Task {body.get("task_id")} has been updated'
+                'message': f'Task with ID {task_id} has been updated'
             }
             return JsonResponse(success_message, status=200)
 
@@ -105,16 +99,21 @@ class TaskAPIView(APIView):
             }
             return JsonResponse(invalid_data_message, status=400)
 
-    def delete(self, request):
-        body = request.body
+    def delete(self, request, task_id=None):
+        # Missing ID
+        if not task_id:
+            missing_id_message = {
+                'message': 'Cannot delete task! Task ID is missing!'
+            }
+            return JsonResponse(missing_id_message, status=400)
 
-        if Task.remove(task_id=body.get('task_id')):
+        if Task.remove(pk=task_id):
             success = {
-                'message': f'Task with id {body.get("task_id")} has been deleted'
+                'message': f'Task with ID {task_id} has been deleted'
             }
             return JsonResponse(success, status=200)
         else:
             failure = {
-                'message': f'Task with id {body.get("task_id")} does not exist!'
+                'message': f'Task with ID {task_id} does not exist!'
             }
             return JsonResponse(failure, status=400)
