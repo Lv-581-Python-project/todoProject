@@ -52,20 +52,3 @@ class Task(AbstractModel):
         if list_id:
             self.list_id = ToDoList.get_by_id(list_id)
         self.save()
-
-    @classmethod
-    def get_all(cls):
-        try:
-            task = Task.objects.all()
-            return task
-        except Task.DoesNotExist:
-            return None
-
-    @classmethod
-    def remove(cls, task_id):
-        try:
-            task = Task.objects.get(id=task_id)
-            task.delete()
-        except Task.DoesNotExist:
-            return False
-        return True

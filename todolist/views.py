@@ -29,7 +29,7 @@ class ToDoListView(APIView):
         data = {
             'name': data.get('name'),
             'description': data.get('description') if data.get('description') else '',
-            'members': [CustomUser.get_by_id(user_id=user_id) for user_id in data.get('members')]
+            'members': [CustomUser.get_by_id(pk=user_id) for user_id in data.get('members')]
             if data.get('members') else None
         }
 
@@ -69,5 +69,5 @@ class ToDoListView(APIView):
         if not todo_list:
             return HttpResponse(status=404)
 
-        todo_list.remove()
+        ToDoList.remove(pk=todo_list_pk)
         return HttpResponse(status=200)

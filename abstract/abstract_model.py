@@ -1,3 +1,5 @@
+from abc import abstractmethod
+
 from django.db import models
 
 
@@ -14,8 +16,28 @@ class AbstractModel(models.Model):
         except cls.DoesNotExist:
             return None
 
-    def create(self, *args, **kwargs):
+    @classmethod
+    def get_all(cls):
+        try:
+            task = cls.objects.all()
+            return task
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
+    def remove(cls, pk):
+        try:
+            task = cls.objects.get(id=pk)
+            task.delete()
+        except cls.DoesNotExist:
+            return False
+        return True
+
+    @abstractmethod
+    def update(self, *args, **kwargs):
         raise NotImplemented
 
-    def delete(self, *args, **kwargs):
+    @classmethod
+    @abstractmethod
+    def create(cls, *args, **kwargs):
         raise NotImplemented
