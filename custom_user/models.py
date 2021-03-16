@@ -1,11 +1,11 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django.http import HttpResponse
 from django.db import models
+from abstract.abstract_model import AbstractModel
 
 
 class UserManager(BaseUserManager):
 
-    def _create_user(self, email, password, **extra_fields):
+    def create_user(self, email, password, **extra_fields):
         if not email:
             raise ValueError('User must have an email address')
         email = self.normalize_email(email)
@@ -17,11 +17,8 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create(self, email, password, **extra_fields):
-        return self._create_user(email, password, **extra_fields)
 
-
-class CustomUser(AbstractBaseUser):
+class CustomUser(AbstractBaseUser, AbstractModel):
     objects = UserManager()
 
     first_name = models.CharField('First Name', max_length=55, null=False, blank=False)
@@ -40,12 +37,9 @@ class CustomUser(AbstractBaseUser):
                 'email': self.email}
 
     @classmethod
-    def get_by_id(cls, user_id):
-        try:
-            user = cls.objects.get(pk=user_id)
-            return user
-        except CustomUser.DoesNotExist:
-            return None
+    def create(cls, email, password, **extra_fields):
+        manager = UserManager()
+        return manager.create_user(email, password, **extra_fields)
 
     def update(self, first_name=None, last_name=None, email=None):
         if first_name:
@@ -59,9 +53,3 @@ class CustomUser(AbstractBaseUser):
             return self
         except (TypeError, ValueError):
             return None
-
-    @classmethod
-    def remove(cls, user_id):
-        user = cls.get_by_id(user_id)
-        user.delete()
-        return HttpResponse('User removed.')
