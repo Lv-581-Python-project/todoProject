@@ -1,10 +1,12 @@
+from abc import abstractmethod
 from datetime import date
 from django.db import models
 from custom_user.models import CustomUser
 from todolist.models import ToDoList
+from abstract.abstract_model import AbstractModel
 
 
-class Task(models.Model):
+class Task(AbstractModel):
     title = models.CharField(max_length=30)
     description = models.TextField(max_length=256)
     is_completed = models.BooleanField(default=False)
@@ -14,14 +16,6 @@ class Task(models.Model):
 
     def __str__(self):
         return self.title
-
-    @classmethod
-    def get_by_id(cls, task_id: int):
-        try:
-            task = Task.objects.get(pk=task_id)
-            return task
-        except Task.DoesNotExist:
-            return None
 
     @classmethod
     def find_all_for_list(cls, list_id):
@@ -38,6 +32,7 @@ class Task(models.Model):
         task.save()
         return task
 
+    @abstractmethod
     def update(self, title: str,
                description: str,
                is_completed: bool,

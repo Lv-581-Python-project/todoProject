@@ -47,12 +47,19 @@ class CustomUser(AbstractBaseUser):
         except CustomUser.DoesNotExist:
             return None
 
-    def update(self, data):
-        self.first_name = data['first_name']
-        self.last_name = data['last_name']
-        self.email = data['email']
-        self.save()
-        return True
+    def update(self, first_name=None, last_name=None, email=None):
+
+        if first_name:
+            self.first_name = first_name
+        if last_name:
+            self.last_name = last_name
+        if email:
+            self.email = email
+        try:
+            self.save()
+            return self
+        except:
+            return None
 
     @classmethod
     def remove(cls, user_id):
