@@ -3,7 +3,6 @@ from custom_user.models import CustomUser
 import json
 
 
-
 class CustomUserModelsTestCase(TestCase):
     def setUp(self):
         self.user = CustomUser.objects.create(id=1,
@@ -67,6 +66,7 @@ class CustomUserModelsTestCase(TestCase):
         res = CustomUser.remove(2)
         self.assertIn(b'User removed', res.content)
 
+
 class CustomUserViewsTestCase(TestCase):
     def setUp(self):
         self.user = CustomUser.objects.create(id=2,
@@ -80,8 +80,6 @@ class CustomUserViewsTestCase(TestCase):
                                               last_name="User2",
                                               email="testuser2@gmail.com",
                                               password="test2")
-
-
 
     def test_get_by_id(self):
         data = {'first_name': 'Test', 'last_name': 'User', 'email': 'testuser@gmail.com'}
@@ -111,7 +109,3 @@ class CustomUserViewsTestCase(TestCase):
     def test_delete(self):
         response = self.client.generic('DELETE', '/custom_user/profile/2/')
         self.assertEqual(response.status_code, 200)
-
-
-
-
