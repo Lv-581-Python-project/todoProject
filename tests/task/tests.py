@@ -107,11 +107,11 @@ class DeleteTaskView(TestCase):
                                 user_id=self.user.id)
 
     def test_delete_task_existing(self):
-        response = self.client.generic('DELETE', '/tasks/', json.dumps({'task_id': self.task.id}))
+        response = self.client.generic('DELETE', f'/tasks/{self.task.id}/')
         self.assertEqual(response.status_code, 200)
 
     def test_delete_task_non_existing(self):
-        response = self.client.generic('DELETE', '/tasks/', json.dumps({'task_id': 10}))
+        response = self.client.generic('DELETE', '/tasks/100/')
         self.assertEqual(response.status_code, 400)
 
 
@@ -170,26 +170,20 @@ class UpdateTaskView(TestCase):
                                 user_id=self.user.id)
 
     def test_update_task_existing(self):
-        response = self.client.generic('PUT', '/tasks/', json.dumps({
-            "title": "UPDATE!", "task_id": self.task.id
+        response = self.client.generic('PUT', f'/tasks/{self.task.id}/', json.dumps({
+            "title": "UPDATE!"
         }))
         self.assertEqual(response.status_code, 200)
 
     def test_update_task_non_existing(self):
-        response = self.client.generic('PUT', '/tasks/', json.dumps({
-            "title": "UPDATE!", "task_id": 10
+        response = self.client.generic('PUT', '/tasks/100/', json.dumps({
+            "title": "UPDATE!"
         }))
         self.assertEqual(response.status_code, 400)
 
     def test_update_task_data_invalid(self):
-        response = self.client.generic('PUT', '/tasks/', json.dumps({
-            "deadline": "May 2021", "task_id": self.task.id
-        }))
-        self.assertEqual(response.status_code, 400)
-
-    def test_update_task_id_invalid(self):
-        response = self.client.generic('PUT', '/tasks/', json.dumps({
-            "deadline": "2020-01-01", "task_id": 'one'
+        response = self.client.generic('PUT', f'/tasks/{self.task.id}/', json.dumps({
+            "deadline": "May 2021"
         }))
         self.assertEqual(response.status_code, 400)
 
