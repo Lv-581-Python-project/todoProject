@@ -3,23 +3,8 @@ from django.db import models
 from abstract.abstract_model import AbstractModel
 
 
-class UserManager(BaseUserManager):
-
-    def create_user(self, email, password, **extra_fields):
-        if not email:
-            raise ValueError('User must have an email address')
-        email = self.normalize_email(email)
-        user = self.model(
-            email=email,
-            **extra_fields
-        )
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-
 class CustomUser(AbstractBaseUser, AbstractModel):
-    objects = UserManager()
+    objects = models.Manager()
 
     first_name = models.CharField('First Name', max_length=55, null=False, blank=False)
     last_name = models.CharField('Last Name', max_length=55, null=False, blank=False)
@@ -38,8 +23,15 @@ class CustomUser(AbstractBaseUser, AbstractModel):
 
     @classmethod
     def create(cls, email, password, **extra_fields):
-        manager = UserManager()
-        return manager.create_user(email, password, **extra_fields)
+        if not email:
+            raise ValueError('User must have an email address')
+        user = CustomUser(
+            email=email,
+            **extra_fields
+        )
+        user.set_password(password)
+        user.save()
+        return user
 
     def update(self, first_name=None, last_name=None, email=None):
         if first_name:
