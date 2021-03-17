@@ -66,21 +66,26 @@ class CustomUserModelsTestCase(TestCase):
 class CustomUserViewsTestCase(TestCase):
     def setUp(self):
         self.user = CustomUser.create(id=2,
-                                              first_name="Test",
-                                              last_name="User",
-                                              email="testuser@gmail.com",
-                                              password="test")
+                                      first_name="Test",
+                                      last_name="User",
+                                      email="testuser@gmail.com",
+                                      password="test")
 
         self.user = CustomUser.create(id=3,
-                                              first_name="Test2",
-                                              last_name="User2",
-                                              email="testuser2@gmail.com",
-                                              password="test2")
+                                      first_name="Test2",
+                                      last_name="User2",
+                                      email="testuser2@gmail.com",
+                                      password="test2")
 
     def test_get_by_id(self):
         data = {'first_name': 'Test', 'last_name': 'User', 'email': 'testuser@gmail.com'}
         responce = self.client.get('/custom-user/profile/2/')
         self.assertEqual(responce.json() , data)
+
+    def test_get_user_not_exist(self):
+        responce = self.client.get('/custom-user/profile/10/')
+        self.assertEqual(responce.status_code, 400)
+
 
     def test_create_user(self):
         data = {'first_name': 'Test3', 'last_name': 'User3', 'email': 'testuser3@gmail.com'}
@@ -88,6 +93,20 @@ class CustomUserViewsTestCase(TestCase):
                                                                                    'last_name': 'User3',
                                                                                    'email': 'testuser3@gmail.com'}))
         self.assertEqual(response.json(),data)
+
+    def test_create_user_empty_json(self):
+        response = self.client.generic('POST', '/custom-user/create/', json.dumps({}))
+        self.assertEqual(response.status_code, 400)
+
+
+    def test_create_user_bad_save(self):
+        response = self.client.generic('POST', '/custom-user/create/', json.dumps({
+            'first_name': 'Test3Test3Test3Test3Test3Test3Test3Test3Test3Test3Test3Test3Test3Test3Test3Test3Test3Test3',
+            'last_name': 'User3',
+            'email': 'testuser3@gmail.com'}))
+        self.assertEqual(response.status_code, 400)
+
+
 
     def test_put_all_input_data(self):
         data = {'first_name': 'NewName', 'last_name': 'User', 'email': 'testuser@gmail.com'}
@@ -102,6 +121,33 @@ class CustomUserViewsTestCase(TestCase):
                                                                                    'email': 'testuser@gmail.com'}))
         self.assertEqual(response.json(), data)
 
+    def test_put_no_user(self):
+        response = self.client.generic('PUT', '/custom-user/profile/100/', json.dumps({'first_name': 'NewName',
+                                                                                     'last_name': 'User',
+                                                                                     'email': 'testuser@gmail.com'}))
+        self.assertEqual(response.status_code, 404)
+
+
+    def test_put_empty_data(self):
+        response = self.client.generic('PUT', '/custom-user/profile/2/', json.dumps({}))
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_user_bad_save(self):
+        response = self.client.generic('PUT', '/custom-user/profile/2/', json.dumps({
+            'first_name': "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890",
+            'last_name': 'User',
+            'email': 'testuser@gmail.com'})
+            )
+        self.assertEqual(response.status_code, 400)
+
     def test_delete(self):
         response = self.client.generic('DELETE', '/custom-user/profile/2/')
         self.assertEqual(response.status_code, 200)
+
+    def test_delete_user_not_found(self):
+        response = self.client.generic('DELETE', '/custom-user/profile/200/')
+        self.assertEqual(response.status_code, 400)
+
+
+
+
