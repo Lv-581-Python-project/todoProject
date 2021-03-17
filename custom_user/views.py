@@ -10,7 +10,7 @@ class ProfileView(APIView):
         user = CustomUser.get_by_id(user_id)
         if user:
             return JsonResponse(user.to_dict())
-        return HttpResponse(status=400)
+        return HttpResponsestatus=400)
 
     def post(self, request):
         if not request.body:
@@ -23,7 +23,7 @@ class ProfileView(APIView):
                 'password': body.get('password'),
                 'email': body.get('email')}
 
-        new_user = CustomUser.objects.create(**data)
+        new_user = CustomUser.create(**data)
         if new_user:
             return JsonResponse(new_user.to_dict(), status=200)
         return HttpResponse('Something went wrong', status=400)
