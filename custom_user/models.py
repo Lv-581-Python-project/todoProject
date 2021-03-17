@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AbstractBaseUser
-from django.db import models
+from django.db import models, DatabaseError
 from utils.abstract_model import AbstractModel
 
 
@@ -30,8 +30,11 @@ class CustomUser(AbstractBaseUser, AbstractModel):
             **extra_fields
         )
         user.set_password(password)
-        user.save()
-        return user
+        try:
+            user.save()
+            return user
+        except (ValueError, TypeError, DatabaseError):
+            return False
 
     def update(self, first_name=None, last_name=None, email=None):
         if first_name:
@@ -43,5 +46,5 @@ class CustomUser(AbstractBaseUser, AbstractModel):
         try:
             self.save()
             return self
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, DatabaseError):
             return None
