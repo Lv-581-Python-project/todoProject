@@ -71,7 +71,7 @@ class CustomUserViewsTestCase(TestCase):
                                               email="testuser@gmail.com",
                                               password="test")
 
-        self.user = CustomUser.objects.create(id=3,
+        self.user = CustomUser.create(id=3,
                                               first_name="Test2",
                                               last_name="User2",
                                               email="testuser2@gmail.com",
