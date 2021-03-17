@@ -1,28 +1,10 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django.http import HttpResponse
-from django.db import models
+from django.contrib.auth.models import AbstractBaseUser
+from django.db import models, DatabaseError
+from utils.abstract_model import AbstractModel
 
 
-class UserManager(BaseUserManager):
-
-    def _create_user(self, email, password, **extra_fields):
-        if not email:
-            raise ValueError('User must have an email address')
-        email = self.normalize_email(email)
-        user = self.model(
-            email=email,
-            **extra_fields
-        )
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create(self, email, password, **extra_fields):
-        return self._create_user(email, password, **extra_fields)
-
-
-class CustomUser(AbstractBaseUser):
-    objects = UserManager()
+class CustomUser(AbstractBaseUser, AbstractModel):
+    objects = models.Manager()
 
     first_name = models.CharField('First Name', max_length=55, null=False, blank=False)
     last_name = models.CharField('Last Name', max_length=55, null=False, blank=False)
@@ -40,22 +22,29 @@ class CustomUser(AbstractBaseUser):
                 'email': self.email}
 
     @classmethod
-    def get_by_id(cls, user_id):
+    def create(cls, email, password, **extra_fields):
+        if not email:
+            raise ValueError('User must have an email address')
+        user = CustomUser(
+            email=email,
+            **extra_fields
+        )
+        user.set_password(password)
         try:
-            user = cls.objects.get(pk=user_id)
+            user.save()
             return user
-        except CustomUser.DoesNotExist:
+        except (ValueError, TypeError, DatabaseError):
+            return False
+
+    def update(self, first_name=None, last_name=None, email=None):
+        if first_name:
+            self.first_name = first_name
+        if last_name:
+            self.last_name = last_name
+        if email:
+            self.email = email
+        try:
+            self.save()
+            return self
+        except (TypeError, ValueError, DatabaseError):
             return None
-
-    def update(self, data):
-        self.first_name = data['first_name']
-        self.last_name = data['last_name']
-        self.email = data['email']
-        self.save()
-        return True
-
-    @classmethod
-    def remove(cls, user_id):
-        user = cls.get_by_id(user_id)
-        user.delete()
-        return HttpResponse('User removed.')

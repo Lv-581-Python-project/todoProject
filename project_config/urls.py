@@ -32,9 +32,9 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('custom_user/', include('custom_user.urls')),
+    path('custom-user/', include('custom_user.urls')),
     path('todolist/', include('todolist.urls')),
     path('tasks/', include('task.urls')),
-    path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path('swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('swagger-redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

@@ -1,9 +1,10 @@
 from django.db import models, IntegrityError, DatabaseError
 
+from utils.abstract_model import AbstractModel
 from custom_user.models import CustomUser
 
 
-class ToDoList(models.Model):
+class ToDoList(AbstractModel):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=500, default='No description for now.')
     members = models.ManyToManyField(CustomUser, related_name='todo_lists')
@@ -43,20 +44,6 @@ class ToDoList(models.Model):
         return members
 
     @classmethod
-    def get_by_id(cls, todo_list_pk):
-        try:
-            todo_list = ToDoList.objects.get(pk=todo_list_pk)
-            return todo_list
-        except ToDoList.DoesNotExist:
-            # log error
-            return None
-
-    @classmethod
-    def get_all(cls):
-        todo_lists = ToDoList.objects.all()
-        return todo_lists
-
-    @classmethod
     def create(cls, name, description='', members=None):
         try:
             todo_list = ToDoList(name=name, description=description)
@@ -67,6 +54,3 @@ class ToDoList(models.Model):
         except (ValueError, IntegrityError, DatabaseError):
             # log error
             return None
-
-    def remove(self):
-        self.delete()

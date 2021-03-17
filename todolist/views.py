@@ -2,7 +2,7 @@ import json
 
 from django.http import JsonResponse, HttpResponse
 from rest_framework.views import APIView
-
+from utils.validators import is_integer
 from .models import CustomUser, ToDoList
 
 
@@ -10,7 +10,7 @@ class ToDoListView(APIView):
 
     def get(self, request, todo_list_pk=None):
         if todo_list_pk:
-            if not todo_list_pk.isnumeric():
+            if not is_integer(todo_list_pk):
                 return HttpResponse(status=404)
             todo_list = ToDoList.get_by_id(todo_list_pk)
             if not todo_list:
@@ -23,18 +23,11 @@ class ToDoListView(APIView):
 
     def post(self, request):
         data = request.body
-        if not data:
-            return HttpResponse(status=400)
-
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({"JsonError": "Provided invalid json"}, status=400)
 
         data = {
             'name': data.get('name'),
             'description': data.get('description') if data.get('description') else '',
-            'members': [CustomUser.get_by_id(user_id=user_id) for user_id in data.get('members')]
+            'members': [CustomUser.get_by_id(pk=user_id) for user_id in data.get('members')]
             if data.get('members') else None
         }
 
@@ -44,19 +37,12 @@ class ToDoListView(APIView):
         return HttpResponse(status=400)
 
     def put(self, request, todo_list_pk=None):
-        if todo_list_pk and not todo_list_pk.isnumeric():
+        if todo_list_pk and not is_integer(todo_list_pk):
             return HttpResponse(status=404)
         todo_list = ToDoList.get_by_id(todo_list_pk)
         if not todo_list:
             return HttpResponse(status=404)
         data = request.body
-        if not data:
-            return HttpResponse(status=400)
-
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return JsonResponse({"JSON Error": 'Provided invalid JSON'}, status=400)
 
         members_to_add = data.get('members_to_add')
         members_to_delete = data.get('members_to_delete')
@@ -73,11 +59,11 @@ class ToDoListView(APIView):
         return HttpResponse(status=200)
 
     def delete(self, request, todo_list_pk=None):
-        if todo_list_pk and not todo_list_pk.isnumeric():
+        if todo_list_pk and not is_integer(todo_list_pk):
             return HttpResponse(status=404)
         todo_list = ToDoList.get_by_id(todo_list_pk)
         if not todo_list:
             return HttpResponse(status=404)
 
-        todo_list.remove()
+        ToDoList.remove(pk=todo_list_pk)
         return HttpResponse(status=200)
