@@ -195,10 +195,10 @@ class ToDoListCRUDTest(TestCase):
         todo_list3 = ToDoList.create(name='test list name 3', description='test list description 3',
                                      members=[self.user, self.user2])
 
-        first_to_dict_expected = {'id': 2, 'name': 'test list name 1', 'description': '', 'members': []}
-        second_to_dict_expected = {'id': 3, 'name': 'test list name 2',
+        first_to_dict_expected = {'id': todo_list1.id, 'name': 'test list name 1', 'description': '', 'members': []}
+        second_to_dict_expected = {'id': todo_list2.id, 'name': 'test list name 2',
                                    'description': 'test list description 2', 'members': []}
-        third_to_dict_expected = {'id': 4, 'name': 'test list name 3',
+        third_to_dict_expected = {'id': todo_list3.id, 'name': 'test list name 3',
                                   'description': 'test list description 3', 'members': [1, 2]}
 
         self.assertEqual(first_to_dict_expected, todo_list1.to_dict())
@@ -228,3 +228,9 @@ class ToDoListCRUDTest(TestCase):
     def test_delete_by_id(self):
         list_del = ToDoList.remove(self.todo_list.id)
         self.assertEqual(True, list_del)
+
+    def test_str(self):
+        self.assertEqual(self.todo_list.name, self.todo_list.__str__())
+
+    def test_get_list_members(self):
+        self.assertEqual(list(self.todo_list.members.all()), list(self.todo_list.get_list_members()))
