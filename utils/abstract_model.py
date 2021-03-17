@@ -19,11 +19,8 @@ class AbstractModel(models.Model):
 
     @classmethod
     def get_all(cls):
-        try:
-            task = cls.objects.all()
-            return task
-        except cls.DoesNotExist:
-            return None
+        task = cls.objects.all()
+        return task
 
     @classmethod
     def remove(cls, pk):  # pylint: disable=C0103
