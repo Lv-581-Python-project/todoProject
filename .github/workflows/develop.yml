@@ -39,5 +39,6 @@ jobs:
         run: |
           echo ls
           cd /home/runner/work/todoProject/todoProject
+          ls
           pip install -r requirements.txt
           coverage run manage.py test tests
