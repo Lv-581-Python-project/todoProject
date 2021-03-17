@@ -1,17 +1,15 @@
-import json
 from django.http import JsonResponse
-from rest_framework.views import APIView
 from django.core.serializers import serialize
 from django.db.utils import IntegrityError, DataError
 from django.core.exceptions import ValidationError
-
+from rest_framework.views import APIView
 from task.models import Task
 
 
 class TaskAPIView(APIView):
 
     def get(self, request, list_id):
-        task = Task.find_all_for_list(list_id=list_id)
+        task = Task.get_by_list_id(list_id=list_id)
 
         task_serialized_data = serialize('python', task)
 

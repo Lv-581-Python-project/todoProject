@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'task',
     'rest_framework',
     'drf_yasg',
-    'abstract'
 ]
 
 MIDDLEWARE = [
@@ -49,7 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'middleware.middleware.JSONMiddleware'
+    'utils.middleware.middleware.JSONMiddleware'
 ]
 
 ROOT_URLCONF = 'project_config.urls'

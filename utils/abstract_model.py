@@ -4,12 +4,13 @@ from django.db import models
 
 
 class AbstractModel(models.Model):
+    objects = models.Manager()
 
     class Meta:
         abstract = True
 
     @classmethod
-    def get_by_id(cls, pk: int):
+    def get_by_id(cls, pk: int):  # pylint: disable=C0103
         try:
             entity = cls.objects.get(pk=pk)
             return entity
@@ -25,7 +26,7 @@ class AbstractModel(models.Model):
             return None
 
     @classmethod
-    def remove(cls, pk):
+    def remove(cls, pk):  # pylint: disable=C0103
         try:
             task = cls.objects.get(id=pk)
             task.delete()
@@ -35,9 +36,9 @@ class AbstractModel(models.Model):
 
     @abstractmethod
     def update(self, *args, **kwargs):
-        raise NotImplemented
+        raise NotImplementedError
 
     @classmethod
     @abstractmethod
     def create(cls, *args, **kwargs):
-        raise NotImplemented
+        raise NotImplementedError

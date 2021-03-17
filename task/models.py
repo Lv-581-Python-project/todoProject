@@ -1,9 +1,9 @@
 from abc import abstractmethod
 from datetime import date
-from django.db import models
+from django.db import models, IntegrityError
 from custom_user.models import CustomUser
 from todolist.models import ToDoList
-from abstract.abstract_model import AbstractModel
+from utils.abstract_model import AbstractModel
 
 
 class Task(AbstractModel):
@@ -11,34 +11,41 @@ class Task(AbstractModel):
     description = models.TextField(max_length=256)
     is_completed = models.BooleanField(default=False)
     deadline = models.DateField()
-    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    list_id = models.ForeignKey(ToDoList, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    todolist = models.ForeignKey(ToDoList, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
 
     @classmethod
-    def find_all_for_list(cls, list_id):
+    def get_by_list_id(cls, list_id: int):
         tasks = Task.objects.filter(list_id=list_id)
         return tasks
 
     @classmethod
-    def create(cls, title: str, description: str, deadline: date, user_id, list_id):
+    def create(cls,
+               title: str,
+               description: str,
+               deadline: date,
+               user: CustomUser,
+               todolist: ToDoList):  # pylint disable=W0221
         task = Task(title=title, description=description, deadline=deadline)
-        user = CustomUser.get_by_id(user_id)
-        task.user_id = user
-        todolist = ToDoList.get_by_id(list_id)
-        task.list_id = todolist
-        task.save()
-        return task
+        task.user = user
+        task.todolist = todolist
+        try:
+            task.save()
+            return task
+        except (ValueError, IntegrityError):
+            return None
 
     @abstractmethod
-    def update(self, title: str,
+    def update(self,
+               title: str,
                description: str,
                is_completed: bool,
                deadline: date,
-               user_id: int,
-               list_id: int):
+               user: CustomUser,
+               todolist: ToDoList):  # pylint disable=W0221
         if title:
             self.title = title
         if description:
@@ -47,8 +54,12 @@ class Task(AbstractModel):
             self.deadline = deadline
         if is_completed:
             self.is_completed = is_completed
-        if user_id:
-            self.user_id = CustomUser.get_by_id(user_id)
-        if list_id:
-            self.list_id = ToDoList.get_by_id(list_id)
-        self.save()
+        if user:
+            self.user = user
+        if todolist:
+            self.todolist = todolist
+        try:
+            self.save()
+            return True
+        except (ValueError, IntegrityError):
+            pass
