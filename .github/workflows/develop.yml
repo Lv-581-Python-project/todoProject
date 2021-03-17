@@ -34,7 +34,6 @@ jobs:
             # Runs a single command using the runners shell
       - name: Run a one-line script
         run: |
-          ls
+          cd todoProject
           pip install -r requirements.txt
           coverage run manage.py test tests
-          
