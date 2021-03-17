@@ -36,9 +36,8 @@ jobs:
           postgresql password: postgres # optional, default is 
             # Runs a single command using the runners shell
       - name: Run a one-line script
+        run: ls
+      - name: Run a one-line script
         run: |
-          echo ls
-          cd /home/runner/work/todoProject/todoProject
-          ls
           pip install -r requirements.txt
           coverage run manage.py test tests
