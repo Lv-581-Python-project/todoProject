@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from datetime import date
-from django.db import models, IntegrityError
+from django.db import models, IntegrityError, DataError
 from custom_user.models import CustomUser
 from todolist.models import ToDoList
 from utils.abstract_model import AbstractModel
@@ -8,7 +8,7 @@ from utils.abstract_model import AbstractModel
 
 class Task(AbstractModel):
     title = models.CharField(max_length=30)
-    description = models.TextField(max_length=256)
+    description = models.TextField(max_length=256, default="")
     is_completed = models.BooleanField(default=False)
     deadline = models.DateField()
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -18,8 +18,8 @@ class Task(AbstractModel):
         return self.title
 
     @classmethod
-    def get_by_list_id(cls, list_id: int):
-        tasks = Task.objects.filter(list_id=list_id)
+    def get_by_list_id(cls,todolist: ToDoList):
+        tasks = Task.objects.filter(todolist_id=todolist.pk)
         return tasks
 
     @classmethod
@@ -35,7 +35,7 @@ class Task(AbstractModel):
         try:
             task.save()
             return task
-        except (ValueError, IntegrityError):
+        except (ValueError, DataError, IntegrityError):
             return None
 
     @abstractmethod
@@ -46,20 +46,20 @@ class Task(AbstractModel):
                deadline: date,
                user: CustomUser,
                todolist: ToDoList):  # pylint disable=W0221
-        if title:
-            self.title = title
-        if description:
-            self.description = description
-        if deadline:
-            self.deadline = deadline
-        if is_completed:
-            self.is_completed = is_completed
-        if user:
-            self.user = user
-        if todolist:
-            self.todolist = todolist
         try:
+            if title:
+                self.title = title
+            if description:
+                self.description = description
+            if deadline:
+                self.deadline = deadline
+            if is_completed:
+                self.is_completed = is_completed
+            if user:
+                self.user = user
+            if todolist:
+                self.todolist = todolist
             self.save()
             return True
-        except (ValueError, IntegrityError):
-            pass
+        except (ValueError, DataError, TypeError, IntegrityError):
+            return None
