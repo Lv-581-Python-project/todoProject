@@ -1,17 +1,18 @@
-import json
 from django.http import JsonResponse
-from rest_framework.views import APIView
 from django.core.serializers import serialize
 from django.db.utils import IntegrityError, DataError
 from django.core.exceptions import ValidationError
-
+from rest_framework.views import APIView
 from task.models import Task
+from todolist.models import ToDoList
+from custom_user.models import CustomUser
 
 
 class TaskAPIView(APIView):
 
     def get(self, request, list_id):
-        task = Task.find_all_for_list(list_id=list_id)
+        todolist = ToDoList.get_by_id(list_id)
+        task = Task.get_by_list_id(todolist)
 
         task_serialized_data = serialize('python', task)
 
@@ -23,12 +24,18 @@ class TaskAPIView(APIView):
     def post(self, request):
         body = request.body
 
+        list_id = body.get('todolist')
+        user_id = body.get('user')
+
+        todolist = ToDoList.get_by_id(list_id)
+        user = CustomUser.get_by_id(user_id)
+
         task_data = {
             'title': body.get('title'),
             'description': body.get('description'),
             'deadline': body.get('deadline'),
-            'user_id': body.get('user_id'),
-            'list_id': body.get('list_id'),
+            'user': user,
+            'todolist': todolist,
         }
 
         try:
@@ -42,7 +49,7 @@ class TaskAPIView(APIView):
             return JsonResponse(success_message, status=201)
 
         # Missing parameters
-        except IntegrityError:
+        except (IntegrityError, AttributeError):
             integrity_message = {
                 'message': 'Cannot create task! One or more parameters are missing'
             }
@@ -57,13 +64,22 @@ class TaskAPIView(APIView):
 
     def put(self, request, task_id=None):
         body = request.body
+        user = None
+        todolist = None
+
+        if body.get('todolist'):
+            list_id = body.get('todolist')
+            todolist = ToDoList.get_by_id(list_id)
+        if body.get('user'):
+            user_id = body.get('user')
+            user = CustomUser.get_by_id(user_id)
 
         task_data = {
             'title': body.get('title'),
             'description': body.get('description'),
             'deadline': body.get('deadline'),
-            'user_id': body.get('user_id'),
-            'list_id': body.get('list_id'),
+            'user': user,
+            'todolist': todolist,
             'is_completed': body.get('list_id'),
         }
 

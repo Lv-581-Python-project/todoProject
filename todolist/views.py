@@ -23,8 +23,6 @@ class ToDoListView(APIView):
 
     def post(self, request):
         data = request.body
-        if not data:
-            return HttpResponse(status=400)
 
         data = {
             'name': data.get('name'),
@@ -45,8 +43,6 @@ class ToDoListView(APIView):
         if not todo_list:
             return HttpResponse(status=404)
         data = request.body
-        if not data:
-            return HttpResponse(status=400)
 
         members_to_add = data.get('members_to_add')
         members_to_delete = data.get('members_to_delete')
