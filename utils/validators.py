@@ -1,7 +1,7 @@
-def is_integer(number):
+def is_integer(n):
     try:
-        float(number)
+        float(n)
     except ValueError:
         return False
     else:
-        return float(number).is_integer()
+        return float(n).is_integer()

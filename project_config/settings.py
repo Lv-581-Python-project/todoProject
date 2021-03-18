@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'task',
     'rest_framework',
     'drf_yasg',
+    'abstract'
 ]
 
 MIDDLEWARE = [
@@ -48,7 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'utils.middleware.middleware.JSONMiddleware'
+    'middleware.middleware.JSONMiddleware'
 ]
 
 ROOT_URLCONF = 'project_config.urls'
@@ -77,10 +78,9 @@ WSGI_APPLICATION = 'project_config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': '127.0.0.1',
+        'HOST': 'postgres',
+        'NAME': 'postgres',
         'PORT': '5432',
     }
 }

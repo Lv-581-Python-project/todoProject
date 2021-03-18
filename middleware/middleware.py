@@ -5,7 +5,7 @@ import json
 
 class JSONMiddleware:
     """
-    Process requests data from PUT and POST requests.
+    Process application/json requests data from GET and POST requests.
     """
 
     def __init__(self, get_response):
@@ -17,7 +17,7 @@ class JSONMiddleware:
                 request._body = json.loads(request.body)
                 return self.get_response(request)
             except json.JSONDecodeError:
-                return HttpResponse("Invalid data.", status=400)
+                return HttpResponse("Invalid JSON", status=400)
         else:
             response = self.get_response(request)
             return response

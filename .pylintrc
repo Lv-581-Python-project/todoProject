@@ -16,7 +16,7 @@ fail-under=10.0
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=CVS, migrations, apps.py, settings.py, local_settings.py, manage.py, tests, urls.py
+ignore=CVS, migrations, apps.py, settings.py, local_settings.py, manage.py, unittests, urls.py
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
@@ -519,7 +519,7 @@ valid-metaclass-classmethod-first-arg=cls
 [DESIGN]
 
 # Maximum number of arguments for function / method.
-max-args=7
+max-args=5
 
 # Maximum number of attributes for a class (see R0902).
 max-attributes=7

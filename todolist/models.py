@@ -1,6 +1,6 @@
 from django.db import models, IntegrityError, DatabaseError
 
-from utils.abstract_model import AbstractModel
+from abstract.abstract_model import AbstractModel
 from custom_user.models import CustomUser
 
 
